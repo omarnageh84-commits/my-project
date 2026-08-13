@@ -1,0 +1,28 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet"><style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'IBM Plex Sans Arabic',sans-serif}
+body{background:#FBF9F6;height:100dvh;overflow:hidden}
+.page{width:100%;height:calc(100dvh - 68px);border:none;display:none}
+.page.active{display:block}
+/* مريح للعين */
+.nav{position:fixed;bottom:0;left:0;right:0;height:68px;background:#fff;border-top:1px solid #F2EFEA;display:flex;align-items:center;z-index:100}
+.nav button{flex:1;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 2px;border-radius:14px;color:#9aa0aa;font-size:10px;font-weight:700}
+.nav button span:first-child{font-size:20px}
+.nav button.active{color:#111;background:#F5F5F4}
+</style></head><body>
+<iframe data-page="home.html" src="home.html" class="page active"></iframe>
+<iframe data-page="daily.html" src="daily.html" class="page"></iframe>
+<iframe data-page="attendance.html" src="attendance.html" class="page"></iframe>
+<iframe data-page="tasks.html" src="tasks.html" class="page"></iframe>
+<nav class="nav">
+  <button class="active" onclick="switchPage('home.html',this)"><span>🏠</span><span>الرئيسية</span></button>
+  <button onclick="switchPage('daily.html',this)"><span>📅</span><span>اليومية</span></button>
+  <button onclick="switchPage('attendance.html',this)"><span>⏱️</span><span>الحضور</span></button>
+  <button onclick="switchPage('tasks.html',this)"><span>📝</span><span>المهام</span></button>
+</nav>
+<script>
+function switchPage(page,btn){
+  document.querySelectorAll('.page').forEach(f=>f.classList.toggle('active',f.dataset.page===page));
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+</script></body></html>
