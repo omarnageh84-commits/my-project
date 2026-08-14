@@ -1,329 +1,187 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'IBM Plex Sans Arabic',sans-serif}
+body{background:#FBF9F6;padding:8px 8px 90px}
+.en{font-family:'JetBrains Mono',monospace!important;direction:ltr!important}
+.c{background:#fff;border:1px solid #F2EFEA;border-radius:18px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.04);cursor:pointer;transition:.12s}.c:active{transform:scale(.97)}
+.h{background:linear-gradient(145deg,#111 0%,#222 100%);color:#fff;border-radius:18px;padding:13px;position:relative;overflow:hidden}
+.t{padding:6px 11px;border-radius:99px;font-size:8px;font-weight:800;border:1px solid #eee;background:#fff;cursor:pointer}.t.a{background:#111;color:#fff}
+.s{width:100%;border:1.5px solid #F2EFEA;border-radius:12px;padding:10px 12px;font-size:11px;background:#fff;outline:none}
+.b{height:5px;background:#F5F5F4;border-radius:99px;overflow:hidden}.f{height:100%;border-radius:99px;transition:1s}
+details{border:1px solid #F2EFEA;border-radius:12px;background:#fff;margin-top:7px}summary{list-style:none;padding:10px 12px;font-size:9px;font-weight:800;display:flex;justify-content:space-between;cursor:pointer}
+/* المودال الجديد بدل confirm القبيح */
+#customModal{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}
+.modalBox{background:#fff;border-radius:20px;padding:18px;width:100%;max-width:320px;box-shadow:0 20px 40px rgba(0,0,0,.2);animation:pop.2s ease}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.modalBtn{flex:1;padding:10px;border-radius:12px;border:none;font-size:10px;font-weight:800;cursor:pointer}
+</style></head><body>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700;800&family=JetBrains+Mono:wght@600&display=swap"
-    rel="stylesheet">
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'IBM Plex Sans Arabic', sans-serif
-    }
+<!-- المودال الشيك -->
+<div id="customModal"><div class="modalBox">
+<div style="text-align:center;margin-bottom:12px"><div style="width:44px;height:44px;background:#FFFBEB;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:20px">⏱️</div>
+<h3 id="modalTitle" style="font-size:12px;font-weight:800">تعديل وقت الانصراف؟</h3>
+<p id="modalMsg" style="font-size:10px;color:#666;margin-top:6px;line-height:1.5"></p>
+</div>
+<div style="display:flex;gap:8px;margin-top:14px">
+<button class="modalBtn" onclick="closeModal(false)" style="background:#F5F5F4;color:#111">إلغاء</button>
+<button class="modalBtn" onclick="closeModal(true)" style="background:#111;color:#fff">حسناً، عدّل</button>
+</div>
+</div></div>
 
-    body {
-      background: #FBF9F6;
-      padding: 8px;
-      padding-bottom: 90px
-    }
+<div style="display:flex;justify-content:space-between;padding:6px 2px 10px"><div><h2 style="font-size:16px;font-weight:800">أهلاً يا عمر 👋</h2><p style="font-size:8px;color:#9aa0aa;margin-top:3px"><span id="d"></span> • <span id="clk" class="en" style="font-weight:800;color:#111">--:--</span> • <b id="hl" class="en" style="background:#111;color:#fff;padding:2px 7px;border-radius:99px;font-size:8px">0%</b></p></div><div style="width:32px;height:32px;background:#111;color:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800">ع</div></div>
 
-    .en {
-      font-family: 'JetBrains Mono', monospace !important;
-      direction: ltr !important
-    }
+<input id="q" class="s" placeholder="🔍 ابحث فئة / محفظة / شخص" oninput="Q=this.value.toLowerCase();R()">
 
-    .card {
-      background: #fff;
-      border: 1px solid #F2EFEA;
-      border-radius: 16px;
-      padding: 12px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, .03);
-      cursor: pointer;
-      transition: .15s
-    }
+<div style="display:grid;grid-template-columns:1.15fr.85fr;gap:6px;margin:10px 0">
+<div class="h" id="attCard">
+<div style="display:flex;justify-content:space-between"><span style="font-size:7px;opacity:.6">🕒 حضور • محمي</span><span id="workHours" class="en" style="font-size:7px;background:rgba(255,255,255,.15);padding:4px 8px;border-radius:99px">0h</span></div>
+<h3 id="attStatus" style="font-size:14px;margin:9px 0 2px;font-weight:800">غير مسجل</h3>
+<p style="font-size:8px;opacity:.6;display:flex;gap:5px;align-items:center"><span id="attDot" style="width:6px;height:6px;border-radius:50%;background:#666;display:inline-block"></span><span id="attSub">سجل حضورك</span></p>
+<div id="liveProgress" style="height:3px;background:rgba(255,255,255,.15);border-radius:99px;margin-top:10px;overflow:hidden;display:none"><div id="liveBar" style="height:100%;width:0%;background:#22c55e;transition:1s"></div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:11px">
+<button id="btnIn" onclick="handleAtt('in')" style="border:none;background:#22c55e;color:#fff;padding:11px;border-radius:12px;font-size:9px;font-weight:800;transition:.15s"><span id="btnInTxt">✓ حضور</span><span id="btnInLoad" style="display:none">⏳</span></button>
+<button id="btnOut" onclick="handleAtt('out')" style="border:none;background:#2a2a2a;color:#fff;padding:11px;border-radius:12px;font-size:9px;font-weight:800;border:1px solid #333;transition:.15s"><span id="btnOutTxt">✕ انصراف</span><span id="btnOutLoad" style="display:none">⏳</span></button>
+</div>
+<div style="display:flex;justify-content:space-between;margin-top:7px;font-size:6px;opacity:.5"><span id="inTime">-</span><span id="outTime">-</span></div>
+</div>
 
-    .card:active {
-      transform: scale(.98)
-    }
+<div style="display:flex;flex-direction:column;gap:6px">
+<div class="c" style="background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border-color:#BBF7D0" onclick="G('total')"><small style="font-size:7px;color:#166534">صافي اليوم</small><b id="todayTotal" class="en" style="display:block;font-size:14px;color:#166534;margin-top:2px">0</b><div style="display:flex;justify-content:space-between;font-size:7px;color:#166534"><span id="todayCount">0 حركة</span><b id="todayProfit" class="en">0</b></div><div class="b" style="margin-top:6px"><div id="todayBar" class="f" style="background:#16a34a;width:0%"></div></div></div>
+<div class="c" onclick="GT()"><div style="display:flex;justify-content:space-between"><small style="font-size:7px;color:#888">مهام</small><span id="tasksDone" style="font-size:7px;background:#F5F5F4;padding:3px 6px;border-radius:99px">0/0</span></div><b id="tasksCount" style="font-size:15px;margin-top:3px">0</b><div class="b" style="margin-top:6px"><div id="taskBar" class="f" style="background:#111;width:0%"></div></div></div>
+</div>
+</div>
 
-    .hero {
-      background: linear-gradient(145deg, #111 0%, #222 100%);
-      color: #fff;
-      border-radius: 18px;
-      padding: 14px;
-      cursor: pointer
-    }
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px">
+<div class="c" style="text-align:center;padding:9px 4px" onclick="G('total')"><small style="font-size:6px;color:#888">كاش</small><b id="cash" class="en" style="display:block;font-size:12px">0</b></div>
+<div class="c" style="text-align:center;padding:9px 4px;background:#FFFBEB" onclick="G('income')"><small style="font-size:6px;color:#92400E">دخل ش</small><b id="mI" class="en" style="display:block;font-size:12px;color:#16a34a">0</b></div>
+<div class="c" style="text-align:center;padding:9px 4px;background:#FEF2F2" onclick="G('expense')"><small style="font-size:6px;color:#991B1B">مصروف ش</small><b id="mE" class="en" style="display:block;font-size:12px;color:#ef4444">0</b></div>
+<div class="c" style="text-align:center;padding:9px 4px;background:#F5F3FF" onclick="G('debt')"><small style="font-size:6px;color:#6d28d9">ديون</small><b id="db" class="en" style="display:block;font-size:12px;color:#7c3aed">0</b></div>
+</div>
 
-    .qbtn {
-      background: #fff;
-      border: 1px solid #F2EFEA;
-      border-radius: 16px;
-      padding: 12px 6px;
-      text-align: center;
-      font-weight: 800;
-      font-size: 11px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      transition: .15s;
-      min-height: 64px;
-      justify-content: center
-    }
+<div class="c" style="cursor:default">
+<div style="display:flex;justify-content:space-between"><b style="font-size:11px">📊 مركز التقارير الشامل</b><span style="font-size:7px;background:#111;color:#fff;padding:4px 8px;border-radius:99px" onclick="EX()">CSV + JSON</span></div>
+<div style="display:flex;gap:4px;margin:9px 0;overflow:auto"><div class="t a" onclick="RG('today',this)">اليوم</div><div class="t" onclick="RG('week',this)">7 أيام</div><div class="t" onclick="RG('month',this)">شهر</div><div class="t" onclick="RG('year',this)">سنة</div><div class="t" onclick="RG('all',this)">الكل</div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+<div style="background:#F0FDF4;border-radius:12px;padding:9px"><div style="font-size:6px;color:#166534">دخل + هامش</div><b id="rI" class="en" style="font-size:12px;color:#16a34a">0</b><div style="font-size:6px" class="en"><span id="rIA">0/يوم</span> • <span id="rMI">0%</span></div></div>
+<div style="background:#FEF2F2;border-radius:12px;padding:9px"><div style="font-size:6px;color:#991B1B">مصروف + حرق</div><b id="rE" class="en" style="font-size:12px;color:#ef4444">0</b><div style="font-size:6px"><span id="rEA" class="en">0/يوم</span> • <span id="rB" style="font-size:6px">-</span></div></div>
+<div style="background:#111;color:#fff;border-radius:12px;padding:9px"><div style="font-size:6px;opacity:.6">صافي + توقع</div><b id="rN" class="en" style="font-size:12px">0</b><div id="rF" class="en" style="font-size:6px;opacity:.7">توقع 0</div></div>
+<div style="background:#FFFBEB;border-radius:12px;padding:9px"><div style="font-size:6px;color:#92400E">ادخار + صحة</div><b id="rS" class="en" style="font-size:12px;color:#92400E">0%</b><div id="rH" style="font-size:6px;color:#92400E">-</div></div>
+</div>
+<canvas id="cv" height="95" style="width:100%;background:#FBF9F6;border-radius:12px;margin-top:8px" onclick="CM=CM==='bar'?'line':'bar';R()"></canvas>
+<details open><summary>📂 الفئات <span id="cC" class="en">0</span></summary><div id="cats" style="padding:8px;display:grid;grid-template-columns:1fr 1fr;gap:5px"></div></details>
+<details><summary>👛 المحافظ <span id="wC" class="en">0</span></summary><div id="wls" style="padding:8px;display:flex;flex-wrap:wrap;gap:4px"></div></details>
+<details><summary>📒 الديون <span id="dC" class="en">0</span></summary><div id="dbs" style="padding:8px"></div></details>
+</div>
 
-    .qbtn:active {
-      transform: scale(.94)
-    }
+<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin:10px 0">
+<button class="c" style="padding:7px 1px;font-size:8px;font-weight:800" onclick="G('expense')">💸<br><small id="qe" class="en">0</small></button>
+<button class="c" style="padding:7px 1px;font-size:8px;font-weight:800" onclick="G('income')">💰<br><small id="qi" class="en">0</small></button>
+<button class="c" style="padding:7px 1px;font-size:8px;font-weight:800" onclick="G('debt')">📒<br><small id="qd" class="en">0</small></button>
+<button class="c" style="padding:7px 1px;font-size:8px;font-weight:800" onclick="G('total')">👛</button>
+<button class="c" style="padding:7px 1px;font-size:8px;font-weight:800" onclick="G('amanat')">🤝<br><small id="qa" class="en">0</small></button>
+<button class="c" style="padding:7px 1px;font-size:8px;font-weight:800" onclick="GT()">⏱️<br><small id="qh" class="en">0h</small></button>
+</div>
 
-    .qbtn small {
-      font-size: 8px;
-      font-weight: 600;
-      opacity: .7;
-      margin-top: 2px
-    }
+<div class="h" style="display:flex;justify-content:space-between"><div><small style="font-size:7px;opacity:.6">الصافي بعد الديون</small><br><b id="net" class="en" style="font-size:16px">0</b></div><div style="text-align:center"><small style="font-size:6px;opacity:.6">أمانات</small><br><b id="amn" class="en" style="font-size:11px;background:rgba(255,255,255,.15);padding:5px 10px;border-radius:99px">0</b></div></div>
+<div id="al" style="margin-top:8px"></div><div id="rc" style="margin-top:8px"></div>
 
-    .bar {
-      height: 6px;
-      border-radius: 999px;
-      background: #F5F5F4;
-      overflow: hidden
-    }
+<script>
+let RGv='month',CM='bar',Q='',attLock=false,pendingAction=null,$=id=>document.getElementById(id),fmt=n=>{let x=typeof n==='string'?parseFloat(n.replace(/,/g,'')):n;return isNaN(x)?'0':Math.round(x).toLocaleString('en-US')};
+const GD=()=>({tr:JSON.parse(localStorage.getItem('daily_trans_v2')||'[]'),db:JSON.parse(localStorage.getItem('debts_pro_v2')||'[]'),am:JSON.parse(localStorage.getItem('amanat_trans')||'[]'),ta:JSON.parse(localStorage.getItem('tasks_v6')||'[]'),at:JSON.parse(localStorage.getItem('att_fixed_final')||'{}'),hl:JSON.parse(localStorage.getItem('att_hols_fixed')||'{}'),lg:JSON.parse(localStorage.getItem('attendance_log')||'[]')});
+setInterval(()=>{let d=new Date();$('clk').innerText=d.toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});$('d').innerText=d.toLocaleDateString('ar-EG',{weekday:'short',day:'numeric',month:'short'})},1000);
+function G(t){localStorage.setItem('daily_active_tab',t);try{parent.switchPage('daily.html',parent.document.querySelectorAll('.nav button')[1])}catch{}}
+function GT(){try{parent.switchPage('attendance.html',parent.document.querySelectorAll('.nav button')[2])}catch{}}
+function RG(v,el){RGv=v;document.querySelectorAll('.t').forEach(x=>x.classList.remove('a'));el.classList.add('a');R()}
+function FR(l){let n=new Date(),y=n.getFullYear(),m=n.getMonth();if(RGv==='today'){let ds=n.toISOString().split('T')[0];return l.filter(t=>t.date===ds)}if(RGv==='week'){let f=new Date();f.setDate(n.getDate()-6);return l.filter(t=>new Date(t.date)>=f)}if(RGv==='month')return l.filter(t=>{try{let d=new Date(t.date);return d.getMonth()===m&&d.getFullYear()===y}catch{return false}});if(RGv==='year')return l.filter(t=>{try{return new Date(t.date).getFullYear()===y}catch{return false}});return l}
 
-    .bar-fill {
-      height: 100%;
-      border-radius: 999px
-    }
+// مودال شيك بدل confirm
+function showModal(title,msg,onConfirm){
+ $('modalTitle').innerText=title; $('modalMsg').innerText=msg;
+ $('customModal').style.display='flex'; pendingAction=onConfirm;
+}
+function closeModal(ok){
+ $('customModal').style.display='none';
+ if(ok && pendingAction) pendingAction();
+ pendingAction=null; attLock=false;
+ $('btnInTxt').style.display='inline'; $('btnInLoad').style.display='none'; $('btnIn').style.transform='scale(1)'; $('btnIn').style.opacity='1';
+ $('btnOutTxt').style.display='inline'; $('btnOutLoad').style.display='none'; $('btnOut').style.transform='scale(1)'; $('btnOut').style.opacity='1';
+}
 
-    .badge {
-      font-size: 7px;
-      padding: 3px 7px;
-      border-radius: 999px;
-      font-weight: 800
-    }
-  </style>
-</head>
-
-<body>
-
-  <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 2px 10px">
-    <div>
-      <h2 style="font-size:18px;font-weight:800">أهلاً يا عمر 👋</h2>
-      <p style="font-size:10px;color:#9aa0aa;margin-top:3px"><span id="today"></span> • <span id="liveClock" class="en"
-          style="font-weight:800;color:#111">--:--</span></p>
-    </div>
-    <div
-      style="width:34px;height:34px;background:#111;color:#fff;border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px">
-      ع</div>
-  </div>
-
-  <div style="display:grid;grid-template-columns:1.15fr.85fr;gap:8px;margin-bottom:8px">
-    <div class="hero" onclick="goAtt()">
-      <div style="display:flex;justify-content:space-between;align-items:center"><span
-          style="font-size:9px;opacity:.6;font-weight:700">🕒 حضور • اضغط للتفاصيل</span><span id="workHours" class="en"
-          style="font-size:8px;background:rgba(255,255,255,.15);padding:4px 8px;border-radius:999px">0h</span></div>
-      <h3 id="attStatus" style="font-size:15px;margin:8px 0 2px;font-weight:800">غير مسجل</h3>
-      <p id="attSub" style="font-size:9px;opacity:.6">سجل حضورك</p>
-      <div style="display:flex;gap:8px;margin-top:12px"><button onclick="event.stopPropagation();checkIn()"
-          style="flex:1;border:none;background:#22c55e;color:#fff;padding:10px;border-radius:12px;font-size:10px;font-weight:800">حضور</button><button
-          onclick="event.stopPropagation();checkOut()"
-          style="flex:1;border:none;background:#2a2a2a;color:#fff;padding:10px;border-radius:12px;font-size:10px;font-weight:800;border:1px solid #333">انصراف</button>
-      </div>
-    </div>
-
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <div class="card" onclick="goDaily('total')"
-        style="background:linear-gradient(135deg,#F0FDF4 0%,#DCFCE7 100%);border-color:#BBF7D0"><span
-          style="font-size:9px;font-weight:800;color:#166534">📊 اليومية</span>
-        <h3 id="todayTotal" class="en" style="font-size:15px;font-weight:800;color:#166534;margin:4px 0">0</h3>
-        <div style="display:flex;justify-content:space-between"><span id="todayCount"
-            style="font-size:8px;color:#166534;opacity:.7">0 حركة</span><span id="todayProfit" class="en"
-            style="font-size:9px;font-weight:800">0</span></div>
-        <div class="bar" style="margin-top:6px">
-          <div id="todayBar" class="bar-fill" style="background:#16a34a;width:0%"></div>
-        </div>
-      </div>
-      <div class="card" onclick="parent.switchPage('tasks.html',parent.document.querySelectorAll('.nav button')[3])">
-        <div style="display:flex;justify-content:space-between"><span
-            style="font-size:9px;font-weight:700;color:#8b8f98">📝 مهام</span><span id="tasksDone"
-            style="font-size:8px;background:#F5F5F4;padding:3px 7px;border-radius:999px">0/0</span></div>
-        <h3 id="tasksCount" style="font-size:18px;font-weight:800;margin:5px 0">0</h3>
-        <div class="bar">
-          <div id="taskBar" class="bar-fill" style="background:#111;width:0%"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">
-    <div class="card" onclick="goDaily('total')" style="text-align:center"><small
-        style="font-size:8px;font-weight:800;color:#8b8f98">💰 كاش</small><b id="cashBalance" class="en"
-        style="display:block;font-size:14px;margin-top:3px">0</b><span class="badge"
-        style="background:#DCFCE7;color:#166534;margin-top:4px;display:inline-block">نشط</span></div>
-    <div class="card" onclick="goDaily('income')" style="text-align:center;background:#FFFBEB;border-color:#FDE68A">
-      <small style="font-size:8px;font-weight:800;color:#92400E">📥 دخل الشهر</small><b id="monthIncome" class="en"
-        style="display:block;font-size:14px;margin-top:3px;color:#166534">0</b><small id="monthIncomeCount"
-        style="font-size:7px;color:#92400E">0 عملية</small>
-    </div>
-    <div class="card" onclick="goDaily('expense')" style="text-align:center;background:#FEF2F2;border-color:#FECACA">
-      <small style="font-size:8px;font-weight:800;color:#991B1B">📤 مصروف الشهر</small><b id="monthExpense" class="en"
-        style="display:block;font-size:14px;margin-top:3px;color:#991B1B">0</b><small id="monthExpenseCount"
-        style="font-size:7px;color:#991B1B">0 عملية</small>
-    </div>
-  </div>
-
-  <div style="display:flex;justify-content:space-between;align-items:center;margin:0 2px 8px"><b
-      style="font-size:11px">إجراءات سريعة</b><span style="font-size:9px;color:#9aa0aa">دوس للانتقال</span></div>
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px">
-    <button class="qbtn" onclick="goDaily('expense')"><span style="font-size:20px">💸</span><span>مصروف</span><small
-        id="q-expense" class="en">0</small></button>
-    <button class="qbtn" onclick="goDaily('income')"><span style="font-size:20px">💰</span><span>دخل</span><small
-        id="q-income" class="en">0</small></button>
-    <button class="qbtn" onclick="goDaily('debt')" style="background:#FFFBEB;border-color:#FDE68A"><span
-        style="font-size:20px">📒</span><span>ديون</span><small id="q-debt" class="en">0</small></button>
-    <button class="qbtn" onclick="goDaily('total')"><span style="font-size:20px">👛</span><span>المحافظ</span><small
-        class="en">كاش</small></button>
-    <button class="qbtn" onclick="goDaily('total')"><span style="font-size:20px">📈</span><span>الإجمالي</span><small
-        class="en">تحليل</small></button>
-    <button class="qbtn" onclick="goAtt()"><span style="font-size:20px">⏱️</span><span>الحضور</span><small id="q-att"
-        class="en">0h</small></button>
-  </div>
-
-  <div class="card" style="margin-bottom:10px" onclick="goDaily('total')">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b
-        style="font-size:11px">📊 حركة 7 أيام</b>
-      <div style="display:flex;gap:8px"><span
-          style="width:8px;height:4px;background:#16a34a;border-radius:999px"></span><span
-          style="font-size:8px">دخل</span><span
-          style="width:8px;height:4px;background:#ef4444;border-radius:999px"></span><span
-          style="font-size:8px">مصروف</span></div>
-    </div>
-    <div id="weekChart" style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;align-items:end;height:60px">
-    </div>
-    <div id="weekLabels"
-      style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:6px;text-align:center;font-size:8px;color:#9aa0aa;font-weight:700">
-    </div>
-  </div>
-
-  <div style="font-weight:800;font-size:11px;margin:10px 2px 8px">ملخص شامل • دوس للانتقال</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-    <div class="card" onclick="goDaily('income')"
-      style="background:linear-gradient(135deg,#F0FDF4 0%,#fff 100%);display:flex;justify-content:space-between;align-items:center">
-      <div><span style="font-size:9px;font-weight:800;color:#166534">إجمالي الدخل</span><br><b id="sumIncome" class="en"
-          style="color:#16a34a;font-size:15px">0</b></div>
-      <div
-        style="width:36px;height:36px;background:#DCFCE7;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px">
-        💰</div>
-    </div>
-    <div class="card" onclick="goDaily('expense')"
-      style="background:linear-gradient(135deg,#FEF2F2 0%,#fff 100%);display:flex;justify-content:space-between;align-items:center">
-      <div><span style="font-size:9px;font-weight:800;color:#991B1B">إجمالي المصروف</span><br><b id="sumExpense"
-          class="en" style="color:#ef4444;font-size:15px">0</b></div>
-      <div
-        style="width:36px;height:36px;background:#FEE2E2;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px">
-        💸</div>
-    </div>
-    <div class="card" onclick="goDaily('debt')"
-      style="background:linear-gradient(135deg,#FFFBEB 0%,#fff 100%);border-color:#FDE68A;display:flex;justify-content:space-between;align-items:center">
-      <div><span style="font-size:9px;font-weight:800;color:#92400E">📌 مستحقة</span><br><b id="sumDue" class="en"
-          style="color:#d97706;font-size:15px">0</b><br><span id="dueCount"
-          style="font-size:8px;background:#FEF3C7;padding:3px 6px;border-radius:999px">0 شخص</span></div>
-      <div
-        style="width:36px;height:36px;background:#FEF3C7;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px">
-        📒</div>
-    </div>
-    <div class="card" onclick="goDaily('debt')"
-      style="background:linear-gradient(135deg,#F5F3FF 0%,#fff 100%);border-color:#DDD6FE;display:flex;justify-content:space-between;align-items:center">
-      <div><span style="font-size:9px;font-weight:800;color:#6d28d9">⏳ مؤجلة</span><br><b id="sumOld" class="en"
-          style="color:#7c3aed;font-size:15px">0</b><br><span id="oldCount"
-          style="font-size:8px;background:#EDE9FE;padding:3px 6px;border-radius:999px">0 شخص</span></div>
-      <div
-        style="width:36px;height:36px;background:#EDE9FE;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px">
-        ⏳</div>
-    </div>
-  </div>
-
-  <div class="card" onclick="goDaily('total')"
-    style="background:#111;color:#fff;display:flex;justify-content:space-between;align-items:center;padding:14px 16px">
-    <div><span style="font-size:9px;opacity:.6;font-weight:700">الصافي العام</span><br><b id="sumNet" class="en"
-        style="font-size:18px">0</b></div>
-    <div style="text-align:center" onclick="event.stopPropagation();goDaily('amanat')"><span
-        style="font-size:8px;opacity:.6">أمانات</span><br><b id="sumAmanat" class="en"
-        style="font-size:13px;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:999px">0</b></div>
-  </div>
-
-  <div id="alerts" style="margin-top:10px"></div>
-  <div id="recent" style="margin-top:12px"></div>
-
-  <script>
-    function fmt(n) { let x = typeof n === 'string' ? parseFloat(n.toString().replace(/,/g, '')) : n; if (isNaN(x)) return '0'; return Math.round(x).toLocaleString('en-US'); }
-    function toEn(s) { return String(s).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[^0-9.:]/g, ''); }
-    function tick() { let d = new Date(); document.getElementById('liveClock').innerText = d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }); document.getElementById('today').innerText = d.toLocaleDateString('ar-EG', { weekday: 'short', day: 'numeric', month: 'short' }); } setInterval(tick, 1000); tick();
-    let trans = JSON.parse(localStorage.getItem('daily_trans_v2') || '[]');
-    let debts = JSON.parse(localStorage.getItem('debts_pro_v2') || '[]');
-    let amanat = JSON.parse(localStorage.getItem('amanat_trans') || '[]');
-    let tasks = JSON.parse(localStorage.getItem('tasks_v6') || '[]');
-    let attData = JSON.parse(localStorage.getItem('att_fixed_final') || '{}');
-    let hols = JSON.parse(localStorage.getItem('att_hols_fixed') || '{}');
-    function goDaily(tab) { let f = parent.document.querySelector('iframe[data-page="daily.html"]'); if (!f.src) f.src = 'daily.html'; parent.switchPage('daily.html', parent.document.querySelectorAll('.nav button')[1]); }
-    function goAtt() { parent.switchPage('attendance.html', parent.document.querySelectorAll('.nav button')[2]); }
-    function calc() {
-      let today = new Date().toISOString().split('T')[0]; let y = new Date().getFullYear(), m = new Date().getMonth() + 1;
-      let tt = trans.filter(t => t.date === today);
-      let todayInc = tt.filter(t => t.type === 'income').reduce((a, b) => a + b.amount, 0);
-      let todayExp = tt.filter(t => t.type === 'expense').reduce((a, b) => a + b.amount, 0);
-      document.getElementById('todayTotal').innerText = fmt(todayInc - todayExp) + ' ج.م';
-      document.getElementById('todayCount').innerText = tt.length + ' حركة';
-      document.getElementById('todayProfit').innerText = (todayInc >= todayExp ? '+' : '') + fmt(todayInc - todayExp);
-      document.getElementById('todayBar').style.width = Math.min(100, Math.abs(todayInc - todayExp) / 500 * 100) + '%';
-      document.getElementById('todayBar').style.background = todayInc >= todayExp ? '#16a34a' : '#ef4444';
-      let monthTrans = trans.filter(t => { try { let d = new Date(t.date); return d.getMonth() + 1 === m && d.getFullYear() === y } catch { return false } });
-      let mInc = monthTrans.filter(t => t.type === 'income').reduce((a, b) => a + b.amount, 0);
-      let mExp = monthTrans.filter(t => t.type === 'expense').reduce((a, b) => a + b.amount, 0);
-      document.getElementById('monthIncome').innerText = fmt(mInc);
-      document.getElementById('monthExpense').innerText = fmt(mExp);
-      document.getElementById('monthIncomeCount').innerText = monthTrans.filter(t => t.type === 'income').length + ' عملية';
-      document.getElementById('monthExpenseCount').innerText = monthTrans.filter(t => t.type === 'expense').length + ' عملية';
-      document.getElementById('q-income').innerText = fmt(mInc); document.getElementById('q-expense').innerText = fmt(mExp);
-      let cash = trans.reduce((s, t) => s + (t.type === 'income' ? t.amount : -t.amount), 0);
-      document.getElementById('cashBalance').innerText = fmt(cash);
-      let due = debts.filter(d => d.type === 'due_monthly'); let old = debts.filter(d => d.type !== 'due_monthly');
-      let dueSum = due.reduce((a, b) => a + (b.remaining || b.total || 0), 0); let oldSum = old.reduce((a, b) => a + (b.remaining || b.total || 0), 0);
-      document.getElementById('sumDue').innerText = fmt(dueSum); document.getElementById('sumOld').innerText = fmt(oldSum);
-      document.getElementById('dueCount').innerText = due.length + ' شخص'; document.getElementById('oldCount').innerText = old.length + ' شخص';
-      document.getElementById('q-debt').innerText = due.length + old.length;
-      let amanatBal = amanat.filter(a => a.type === 'in').reduce((s, a) => s + a.amount, 0) - amanat.filter(a => a.type === 'out').reduce((s, a) => s + a.amount, 0);
-      document.getElementById('sumAmanat').innerText = fmt(amanatBal);
-      let totalInc = trans.filter(t => t.type === 'income').reduce((a, b) => a + b.amount, 0);
-      let totalExp = trans.filter(t => t.type === 'expense').reduce((a, b) => a + b.amount, 0);
-      document.getElementById('sumIncome').innerText = fmt(totalInc); document.getElementById('sumExpense').innerText = fmt(totalExp);
-      document.getElementById('sumNet').innerText = fmt(totalInc - totalExp - dueSum - oldSum);
-      document.getElementById('tasksCount').innerText = tasks.length;
-      let done = tasks.filter(t => t.done).length;
-      document.getElementById('tasksDone').innerText = done + '/' + tasks.length;
-      document.getElementById('taskBar').style.width = tasks.length ? Math.round(done / tasks.length * 100) + '%' : '0%';
-      let weekChart = document.getElementById('weekChart'); let weekLabels = document.getElementById('weekLabels');
-      let html = '', labels = '';
-      for (let i = 6; i >= 0; i--) { let d = new Date(); d.setDate(d.getDate() - i); let ds = d.toISOString().split('T')[0]; let dayTrans = trans.filter(t => t.date === ds); let inc = dayTrans.filter(t => t.type === 'income').reduce((a, b) => a + b.amount, 0); let exp = dayTrans.filter(t => t.type === 'expense').reduce((a, b) => a + b.amount, 0); let max = Math.max(inc, exp, 100); let hInc = Math.max(4, inc / max * 42); let hExp = Math.max(4, exp / max * 42); html += `<div style="display:flex;flex-direction:column;gap:2px;align-items:center;justify-content:end;height:60px"><div style="width:100%;background:#16a34a;border-radius:6px 6px 0 0;height:${hInc}px"></div><div style="width:100%;background:#fee2e2;border-radius:0 0 6px 6px;height:${hExp}px"></div></div>`; labels += `<div>${d.toLocaleDateString('ar-EG', { weekday: 'short' }).slice(0, 2)}</div>`; }
-      weekChart.innerHTML = html; weekLabels.innerHTML = labels;
-      let totalH = 0; Object.entries(attData).forEach(([k, r]) => { let [yy, mm] = k.split('-').map(Number); if (yy === y && mm === m && !hols[k]) { let s = parseFloat(toEn(r.in || '0')) || 0; let e = parseFloat(toEn(r.out || '0')) || 0; if (e > s) totalH += e - s; } });
-      document.getElementById('monthHours') ? document.getElementById('monthHours').innerText = totalH.toFixed(1) + 'h' : null;
-      let qatt = document.getElementById('q-att'); if (qatt) qatt.innerText = totalH.toFixed(1) + 'h';
-      let v1 = parseFloat(localStorage.getItem('att_v1') || '1200') || 1200; let v2 = parseFloat(localStorage.getItem('att_v2') || '26') || 26;
-      let hp = document.getElementById('hourPrice'); if (hp) hp.innerText = (v1 / v2).toFixed(0) + ' ج';
-      let wh = document.getElementById('workHours'); if (wh) wh.innerText = totalH.toFixed(1) + 'h';
-      let alerts = document.getElementById('alerts'); let alertHtml = '';
-      if (dueSum > 0) alertHtml += `<div class="card" onclick="goDaily('debt')" style="background:#FFFBEB;border-color:#FDE68A;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding:11px"><span style="font-size:10px">📌 <b>${due.length}</b> مستحقة <b class="en">${fmt(dueSum)}</b></span><span style="font-size:9px;background:#92400E;color:#fff;padding:5px 10px;border-radius:999px">عرض</span></div>`;
-      if (oldSum > 0) alertHtml += `<div class="card" onclick="goDaily('debt')" style="background:#F5F3FF;border-color:#DDD6FE;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding:11px"><span style="font-size:10px">⏳ <b>${old.length}</b> مؤجلة <b class="en">${fmt(oldSum)}</b></span><span style="font-size:9px;background:#6d28d9;color:#fff;padding:5px 10px;border-radius:999px">عرض</span></div>`;
-      alerts.innerHTML = alertHtml;
-      let recentDiv = document.getElementById('recent'); let last3 = trans.slice(0, 3);
-      if (last3.length) {
-        let rHtml = '<div style="display:flex;justify-content:space-between;margin:10px 2px 6px"><b style="font-size:11px">آخر الحركات</b><span style="font-size:9px;color:#9aa0aa" onclick="goDaily(\'income\')">الكل</span></div>';
-        last3.forEach(t => { rHtml += `<div class="card" onclick="goDaily('${t.type}')" style="display:flex;justify-content:space-between;align-items:center;padding:11px;margin-bottom:6px"><div style="display:flex;gap:8px;align-items:center"><div style="width:32px;height:32px;border-radius:10px;background:${t.type === 'income' ? '#DCFCE7' : '#FEE2E2'};display:flex;align-items:center;justify-content:center;font-size:15px">${t.type === 'income' ? '💰' : '💸'}</div><div><div style="font-size:11px;font-weight:700">${t.cat}</div><div style="font-size:7px;color:#9aa0aa">${t.date} • ${t.wallet}</div></div></div><b class="en" style="font-size:12px;color:${t.type === 'income' ? '#16a34a' : '#ef4444'}">${fmt(t.amount)}</b></div>`; });
-        recentDiv.innerHTML = rHtml;
-      }
-    }
-    function getLog() { return JSON.parse(localStorage.getItem('attendance_log') || '[]'); } function saveLog(l) { localStorage.setItem('attendance_log', JSON.stringify(l)); }
-    function syncToSheet(type) { let n = new Date(); let y = n.getFullYear(), m = n.getMonth() + 1, d = n.getDate(); let key = `${y}-${m}-${d}`; let timeDec = (n.getHours() + n.getMinutes() / 60).toFixed(2); let data = JSON.parse(localStorage.getItem('att_fixed_final') || '{}'); if (!data[key]) data[key] = { in: '', out: '' }; if (type === 'in') data[key].in = timeDec; else data[key].out = timeDec; localStorage.setItem('att_fixed_final', JSON.stringify(data)); try { let f = parent.document.querySelector('iframe[data-page="attendance.html"]'); if (f && f.contentWindow && f.contentWindow.renderAll) { f.contentWindow.renderAll(); f.contentWindow.calcTotals(); } } catch (e) { } }
-    function renderAtt() { let log = getLog(); let today = new Date().toISOString().split('T')[0]; let rec = log.find(r => r.date === today); let el = document.getElementById('attStatus'); if (!rec) { el.innerText = 'غير مسجل'; el.style.color = '#fca5a5'; return; } if (rec.in && !rec.out) { el.innerText = 'حاضر من ' + rec.in; el.style.color = '#4ade80'; } else if (rec.in && rec.out) { el.innerHTML = 'انصرف ' + rec.out; el.style.color = '#fca5a5'; } }
-    function checkIn() { let log = getLog(); let today = new Date().toISOString().split('T')[0]; let now = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }); let rec = log.find(r => r.date === today); if (rec && rec.in) return; if (!rec) { rec = { date: today, in: now, out: null }; log.push(rec); } else { rec.in = now; } saveLog(log); renderAtt(); syncToSheet('in'); calc(); }
-    function checkOut() { let log = getLog(); let today = new Date().toISOString().split('T')[0]; let rec = log.find(r => r.date === today); if (!rec || !rec.in) return; rec.out = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }); saveLog(log); renderAtt(); syncToSheet('out'); calc(); }
-    calc(); renderAtt(); setInterval(calc, 4000);
-  </script>
-</body>
-
-</html>
+function handleAtt(type){
+ if(attLock) return; attLock=true;
+ let btn=type==='in'?$('btnIn'):$('btnOut'), txt=type==='in'?$('btnInTxt'):$('btnOutTxt'), load=type==='in'?$('btnInLoad'):$('btnOutLoad');
+ if(navigator.vibrate) navigator.vibrate(30);
+ txt.style.display='none'; load.style.display='inline'; btn.style.transform='scale(.92)'; btn.style.opacity='.7';
+ setTimeout(()=>{
+  let log=GD().lg, today=new Date().toISOString().split('T')[0], now=new Date(), timeStr=now.toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}), timeDec=(now.getHours()+now.getMinutes()/60+now.getSeconds()/3600).toFixed(3), rec=log.find(r=>r.date===today);
+  if(type==='in'){
+   if(rec&&rec.in){toast('سجلت حضور '+rec.in); closeModal(false); return;}
+   if(!rec){rec={date:today,in:timeStr,out:null,inDec:timeDec,outDec:null}; log.push(rec);} else {rec.in=timeStr; rec.inDec=timeDec;}
+   localStorage.setItem('attendance_log',JSON.stringify(log));
+   let data=GD().at; if(!data[today]) data[today]={in:'',out:''}; data[today].in=timeDec; localStorage.setItem('att_fixed_final',JSON.stringify(data));
+   toast('حضور '+timeStr+' ✓'); renderAtt(); R(); closeModal(false);
+  }else{
+   if(!rec||!rec.in){toast('لازم حضور أولاً'); closeModal(false); return;}
+   if(rec.out){
+    // بدل confirm القبيح -> مودال شيك
+    txt.style.display='inline'; load.style.display='none'; btn.style.transform='scale(1)'; btn.style.opacity='1';
+    showModal('تعديل وقت الانصراف؟',`مسجل انصراف ${rec.out} وعاوز تغيره لـ ${timeStr} ؟`,()=>{
+      rec.out=timeStr; rec.outDec=timeDec;
+      localStorage.setItem('attendance_log',JSON.stringify(log));
+      let data=GD().at; if(!data[today]) data[today]={in:'',out:''}; data[today].out=timeDec; localStorage.setItem('att_fixed_final',JSON.stringify(data));
+      let dur=(parseFloat(rec.outDec)-parseFloat(rec.inDec)).toFixed(1); toast('تم التعديل • '+dur+'h');
+      renderAtt(); R();
+    });
+    return;
+   }
+   rec.out=timeStr; rec.outDec=timeDec;
+   localStorage.setItem('attendance_log',JSON.stringify(log));
+   let data=GD().at; if(!data[today]) data[today]={in:'',out:''}; data[today].out=timeDec; localStorage.setItem('att_fixed_final',JSON.stringify(data));
+   let dur=(parseFloat(rec.outDec)-parseFloat(rec.inDec)).toFixed(1); toast('انصراف '+timeStr+' • '+dur+'h');
+   renderAtt(); R(); closeModal(false);
+  }
+ },300);
+}
+function toast(m){let t=document.createElement('div');t.innerText=m;t.style.cssText='position:fixed;bottom:85px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:9px 15px;border-radius:99px;font-size:10px;font-weight:700;z-index:99999;box-shadow:0 8px 20px rgba(0,0,0,.2)';document.body.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(10px)';t.style.transition='.3s'},1700);setTimeout(()=>t.remove(),2000);}
+function renderAtt(){
+ let log=GD().lg, today=new Date().toISOString().split('T')[0], rec=log.find(r=>r.date===today);
+ let st=$('attStatus'), sub=$('attSub'), dot=$('attDot'), inT=$('inTime'), outT=$('outTime'), prog=$('liveProgress'), bar=$('liveBar'), btnIn=$('btnIn'), btnOut=$('btnOut');
+ if(!rec){st.innerText='غير مسجل'; st.style.color='#fca5a5'; dot.style.background='#ef4444'; sub.innerText='سجل حضورك'; inT.innerText='-'; outT.innerText='-'; prog.style.display='none'; btnIn.style.opacity='1'; btnOut.style.opacity='.4'; $('workHours').innerText='0h'; return;}
+ if(rec.in&&!rec.out){st.innerText='حاضر من '+rec.in; st.style.color='#4ade80'; dot.style.background='#22c55e'; sub.innerText='يوم نشط'; inT.innerText='دخول: '+rec.in; outT.innerText='جاري...'; prog.style.display='block'; bar.style.width='60%'; btnIn.style.opacity='.3'; btnOut.style.opacity='1'; let nowDec=(new Date().getHours()+new Date().getMinutes()/60); $('workHours').innerText=(nowDec-parseFloat(rec.inDec||0)).toFixed(1)+'h LIVE';}
+ else{st.innerText='انصرف '+rec.out; st.style.color='#fca5a5'; dot.style.background='#9aa0aa'; let dur=(parseFloat(rec.outDec||0)-parseFloat(rec.inDec||0)).toFixed(1); sub.innerText='انتهى • '+dur+' ساعة'; inT.innerText='دخول: '+rec.in; outT.innerText='خروج: '+rec.out+' ('+dur+'h)'; prog.style.display='block'; bar.style.width='100%'; bar.style.background='#9aa0aa'; btnIn.style.opacity='.3'; btnOut.style.opacity='.6'; $('workHours').innerText=dur+'h';}
+}
+function R(){
+ let {tr,db,am,ta,at,hl}=GD(), fl=Q?tr.filter(t=>(t.cat+' '+(t.wallet||'')+' '+(t.note||'')).toLowerCase().includes(Q)):tr;
+ let y=new Date().getFullYear(), mn=new Date().getMonth()+1;
+ let mTr=fl.filter(t=>{try{let d=new Date(t.date);return d.getMonth()+1===mn&&d.getFullYear()===y}catch{return false}});
+ let mI=mTr.filter(t=>t.type==='income').reduce((a,b)=>a+(b.amount||0),0), mE=mTr.filter(t=>t.type==='expense').reduce((a,b)=>a+(b.amount||0),0);
+ $('mI').innerText=fmt(mI); $('mE').innerText=fmt(mE); $('qe').innerText=fmt(mE); $('qi').innerText=fmt(mI);
+ let cash=tr.reduce((s,t)=>s+(t.type==='income'?t.amount:-t.amount),0); $('cash').innerText=fmt(cash);
+ let due=db.filter(d=>d.type==='due_monthly'), old=db.filter(d=>d.type!=='due_monthly'), dueS=due.reduce((a,b)=>a+(b.remaining||b.total||0),0), oldS=old.reduce((a,b)=>a+(b.remaining||b.total||0),0);
+ $('db').innerText=fmt(dueS+oldS); $('qd').innerText=db.length; $('dC').innerText=db.length;
+ let amB=am.filter(a=>a.type==='in').reduce((s,a)=>s+(a.amount||0),0)-am.filter(a=>a.type==='out').reduce((s,a)=>s+(a.amount||0),0);
+ $('amn').innerText=fmt(amB); $('qa').innerText=fmt(amB);
+ let tI=fl.filter(t=>t.type==='income').reduce((a,b)=>a+(b.amount||0),0), tE=fl.filter(t=>t.type==='expense').reduce((a,b)=>a+(b.amount||0),0);
+ $('net').innerText=fmt(tI-tE-dueS-oldS);
+ $('todayTotal').innerText=fmt(fl.filter(t=>t.date===new Date().toISOString().split('T')[0]).reduce((a,b)=>a+(b.type==='income'?b.amount:-b.amount),0))+' ج.م';
+ let tt=fl.filter(t=>t.date===new Date().toISOString().split('T')[0]); $('todayCount').innerText=tt.length+' حركة'; $('todayProfit').innerText=fmt(tt.reduce((a,b)=>a+(b.type==='income'?b.amount:-b.amount),0)); $('todayBar').style.width=Math.min(100,Math.abs(tt.reduce((a,b)=>a+(b.type==='income'?b.amount:-b.amount),0))/1000*100+10)+'%';
+ $('tasksCount').innerText=ta.length; $('tasksDone').innerText=ta.filter(t=>t.done).length+'/'+ta.length; $('taskBar').style.width=ta.length?Math.round(ta.filter(t=>t.done).length/ta.length*100)+'%':'0%';
+ let rp=FR(fl), rI=rp.filter(t=>t.type==='income').reduce((a,b)=>a+(b.amount||0),0), rE=rp.filter(t=>t.type==='expense').reduce((a,b)=>a+(b.amount||0),0), rN=rI-rE;
+ let days=RGv==='today'?1:RGv==='week'?7:RGv==='month'?new Date().getDate():RGv==='year'?Math.ceil((new Date()-new Date(y,0,1))/86400000):Math.max(1,rp.length);
+ $('rI').innerText=fmt(rI); $('rE').innerText=fmt(rE); $('rN').innerText=fmt(rN); $('rIA').innerText=fmt(rI/days)+'/يوم'; $('rEA').innerText=fmt(rE/days)+'/يوم'; $('rMI').innerText=(rI?Math.round(rN/rI*100):0)+'%';
+ let fc=mE+((new Date(y,mn,0).getDate()-new Date().getDate())*(mE/Math.max(1,new Date().getDate()))); $('rF').innerText=RGv==='month'?fmt(rI-fc)+' متوقع':'-';
+ let by={};rp.forEach(t=>{if(!by[t.date]) by[t.date]={i:0,e:0};t.type==='income'?by[t.date].i+=t.amount:by[t.date].e+=t.amount});let best='-',bv=-1e9;Object.entries(by).forEach(([k,v])=>{let n=v.i-v.e;if(n>bv){bv=n;best=k}});$('rB').innerText=best.slice(-5)+' ('+fmt(bv)+')'; $('rS').innerText=(rI?Math.round(rN/rI*100):0)+'%'; $('rH').innerText=(rI?Math.round(rN/rI*100):0)>30?'ممتاز':'جيد'; $('hl').innerText=(rI?Math.max(0,Math.min(100,Math.round(rN/rI*70+(cash>0?20:0)))):0)+'%';
+ let cm={};rp.forEach(t=>{let k=t.cat||'غير مصنف';if(!cm[k]) cm[k]={i:0,e:0,c:0};t.type==='income'?cm[k].i+=t.amount:cm[k].e+=t.amount;cm[k].c++});let sc=Object.entries(cm).sort((a,b)=>(b[1].i+b[1].e)-(a[1].i+a[1].e)).slice(0,6);$('cC').innerText=sc.length; $('cats').innerHTML=sc.map(([n,v])=>`<div style="background:#FBF9F6;border:1px solid #F2EFEA;border-radius:10px;padding:7px"><div style="font-size:8px;font-weight:800;display:flex;justify-content:space-between"><span>${n}</span><span style="color:#999">${v.c}</span></div><div style="display:flex;justify-content:space-between;margin-top:3px"><span class="en" style="font-size:8px;color:#16a34a">+${fmt(v.i)}</span><span class="en" style="font-size:8px;color:#ef4444">-${fmt(v.e)}</span></div><div class="b" style="margin-top:4px"><div class="f" style="width:${Math.min(100,(v.i+v.e)/500*100)}%;background:${v.i>=v.e?'#16a34a':'#ef4444'}"></div></div></div>`).join('')||'لا يوجد';
+ let wl={};fl.forEach(t=>{let w=t.wallet||'كاش';if(!wl[w]) wl[w]={s:0,c:0};wl[w].s+=t.type==='income'?t.amount:-t.amount;wl[w].c++});$('wC').innerText=Object.keys(wl).length; $('wls').innerHTML=Object.entries(wl).map(([w,v])=>`<span style="background:#fff;border:1px solid #eee;border-radius:99px;padding:5px 9px;font-size:7px"><b>${w}</b> <span class="en" style="color:${v.s>=0?'#16a34a':'#ef4444'}">${fmt(v.s)} (${v.c})</span></span>`).join('');
+ $('dbs').innerHTML=db.slice(0,10).map(d=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #eee"><span style="font-size:8px;font-weight:700">${d.name||d.person||'شخص'}</span><span class="en" style="font-size:8px;color:${d.type==='due_monthly'?'#d97706':'#7c3aed'}">${fmt(d.remaining||d.total||0)}</span></div>`).join('')||'لا يوجد';
+ let totH=0;Object.entries(at).forEach(([k,r])=>{let [yy,mm]=k.split('-').map(Number);if(yy===y&&mm===mn&&!hl[k]){let s=parseFloat(String(r.in||'0').replace(/[^0-9.]/g,''))||0,e=parseFloat(String(r.out||'0').replace(/[^0-9.]/g,''))||0;if(e>s) totH+=e-s}});$('qh').innerText=totH.toFixed(1)+'h';
+ $('al').innerHTML=(dueS>0?`<div class="c" onclick="G('debt')" style="background:#FFFBEB;padding:9px;margin-bottom:4px;font-size:8px">📌 ${due.length} مستحقة <b class="en">${fmt(dueS)}</b></div>`:'')+(cash<0?`<div class="c" style="background:#FEF2F2;padding:9px;font-size:8px">⚠️ كاش سالب ${fmt(cash)}</div>`:'');
+ $('rc').innerHTML='<div style="font-size:9px;font-weight:800;margin:8px 2px 5px">آخر الحركات</div>'+fl.slice(0,5).map(t=>`<div class="c" onclick="G('${t.type}')" style="display:flex;justify-content:space-between;padding:9px;margin-bottom:4px"><div style="display:flex;gap:7px"><div style="width:26px;height:26px;border-radius:7px;background:${t.type==='income'?'#DCFCE7':'#FEE2E2'};display:flex;align-items:center;justify-content:center;font-size:10px">${t.type==='income'?'💰':'💸'}</div><div><div style="font-size:9px;font-weight:700">${t.cat}</div><div style="font-size:6px;color:#999">${t.date} • ${t.wallet||'كاش'}</div></div></div><b class="en" style="font-size:10px;color:${t.type==='income'?'#16a34a':'#ef4444'}">${fmt(t.amount)}</b></div>`).join('');
+ draw(rp); renderAtt();
+}
+function draw(list){let c=$('cv'),x=c.getContext('2d'),W=c.width=c.clientWidth*2,H=c.height=190;x.clearRect(0,0,W,H);let map={},labs=[];for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);let ds=d.toISOString().split('T')[0];map[ds]={i:0,e:0};labs.push(ds)}if(RGv!=='week'&&RGv!=='today'){map={};labs=[];list.forEach(t=>{if(!map[t.date]){map[t.date]={i:0,e:0};labs.push(t.date)}})}list.forEach(t=>{if(map[t.date]){t.type==='income'?map[t.date].i+=t.amount:map[t.date].e+=t.amount}});let max=Math.max(100,...Object.values(map).map(v=>Math.max(v.i,v.e)));if(CM==='bar'){let bw=W/(labs.length*2.6),g=bw*0.6;labs.forEach((l,i)=>{let v=map[l]||{i:0,e:0},X=16+i*(bw*2+g);x.fillStyle='#16a34a';x.beginPath();x.roundRect(X,H-18-v.i/max*(H-38),bw,v.i/max*(H-38),5);x.fill();x.fillStyle='#fca5a5';x.beginPath();x.roundRect(X+bw+3,H-18-v.e/max*(H-38),bw,v.e/max*(H-38),5);x.fill()})}else{let cum=0,pts=[];labs.forEach((l,i)=>{let v=map[l]||{i:0,e:0};cum+=v.i-v.e;pts.push({x:16+i*(W-32)/Math.max(1,labs.length-1),y:H-18-cum/max*(H-38)})});x.strokeStyle='#111';x.lineWidth=2.5;x.beginPath();pts.forEach((p,i)=>i?x.lineTo(p.x,p.y):x.moveTo(p.x,p.y));x.stroke();pts.forEach(p=>{x.fillStyle='#111';x.beginPath();x.arc(p.x,p.y,3,0,6.28);x.fill()})}}
+function EX(){let {tr}=GD();let csv='date,type,cat,amount,wallet\n'+tr.map(t=>`${t.date},${t.type},${t.cat},${t.amount},${t.wallet||''}`).join('\n');let b=new Blob([csv],{type:'text/csv'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='report.csv';a.click()}
+R();renderAtt();setInterval(()=>{R();renderAtt()},3000);
+$('customModal').addEventListener('click',e=>{if(e.target===$('customModal')) closeModal(false)});
+</script></body></html>
