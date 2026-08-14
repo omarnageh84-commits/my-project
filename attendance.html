@@ -1,139 +1,292 @@
-<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet"><style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:'IBM Plex Sans Arabic',sans-serif}
-body{background:#FBF9F6;padding:5px;padding-bottom:70px}
-.en{font-family:'JetBrains Mono',monospace!important;direction:ltr!important;text-align:center}
-.card{background:#fff;border:1px solid #F2EFEA;border-radius:14px;padding:7px;width:100%}
-.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin:5px 0;width:100%}
-.stat{border-radius:11px;padding:6px 3px;border:1px solid transparent;text-align:center}
-.stat:nth-child(1){background:#E0F2FE;border-color:#BAE6FD}
-.stat:nth-child(2){background:#DCFCE7;border-color:#BBF7D0}
-.stat:nth-child(3){background:#FEF9C3;border-color:#FDE68A}
-.stat:nth-child(4){background:#FFEDD5;border-color:#FED7AA}
-.stat:nth-child(5){background:#FCE7F3;border-color:#FBCFE8}
-.stat:nth-child(6){background:#EDE9FE;border-color:#DDD6FE}
-.stat small{font-size:7px;font-weight:700;opacity:.6;display:block}
-.stat b,.stat input{font-size:10.5px!important;font-weight:800;margin-top:1px}
-.time-box{width:100%;border:1px solid #F2EFEA;border-radius:9px;padding:5px 2px;text-align:center;font-size:10.5px;background:#FBF9F6;outline:none}
-.time-box:focus{background:#fff;border-color:#111}
-.table-wrap{background:#fff;border:1px solid #F2EFEA;border-radius:14px;overflow:hidden;width:100%}
-.table-head{display:grid;grid-template-columns:1.2fr.8fr.8fr.6fr.7fr.35fr;background:#FAF8F5;font-size:7px;font-weight:700;padding:6px 3px;text-align:center;color:#9aa0aa;border-bottom:1px solid #F2EFEA}
-.row-item{display:grid;grid-template-columns:1.2fr.8fr.8fr.6fr.7fr.35fr;gap:3px;align-items:center;padding:4px 2px;border-bottom:1px solid #FBF9F6;background:#fff}
-</style></head><body>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 
-<div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px">
-  <div style="display:flex;gap:6px;align-items:center">
-    <div style="font-size:10px;font-weight:800">⏱️ الحضور</div>
-    <button onclick="toggleTop()" id="toggleBtn" style="background:#F5F5F4;border:none;padding:3px 7px;border-radius:999px;font-size:7.5px;font-weight:700">▲ إخفاء</button>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=JetBrains+Mono:wght@600&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'IBM Plex Sans Arabic', sans-serif
+    }
+
+    body {
+      background: #FBF9F6;
+      padding: 5px;
+      padding-bottom: 70px
+    }
+
+    .en {
+      font-family: 'JetBrains Mono', monospace !important;
+      direction: ltr !important;
+      text-align: center
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #F2EFEA;
+      border-radius: 14px;
+      padding: 7px;
+      width: 100%
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 5px;
+      margin: 5px 0;
+      width: 100%
+    }
+
+    .stat {
+      border-radius: 11px;
+      padding: 6px 3px;
+      border: 1px solid transparent;
+      text-align: center
+    }
+
+    .stat:nth-child(1) {
+      background: #E0F2FE;
+      border-color: #BAE6FD
+    }
+
+    .stat:nth-child(2) {
+      background: #DCFCE7;
+      border-color: #BBF7D0
+    }
+
+    .stat:nth-child(3) {
+      background: #FEF9C3;
+      border-color: #FDE68A
+    }
+
+    .stat:nth-child(4) {
+      background: #FFEDD5;
+      border-color: #FED7AA
+    }
+
+    .stat:nth-child(5) {
+      background: #FCE7F3;
+      border-color: #FBCFE8
+    }
+
+    .stat:nth-child(6) {
+      background: #EDE9FE;
+      border-color: #DDD6FE
+    }
+
+    .stat small {
+      font-size: 7px;
+      font-weight: 700;
+      opacity: .6;
+      display: block
+    }
+
+    .stat b,
+    .stat input {
+      font-size: 10.5px !important;
+      font-weight: 800;
+      margin-top: 1px
+    }
+
+    .time-box {
+      width: 100%;
+      border: 1px solid #F2EFEA;
+      border-radius: 9px;
+      padding: 5px 2px;
+      text-align: center;
+      font-size: 10.5px;
+      background: #FBF9F6;
+      outline: none
+    }
+
+    .time-box:focus {
+      background: #fff;
+      border-color: #111
+    }
+
+    .table-wrap {
+      background: #fff;
+      border: 1px solid #F2EFEA;
+      border-radius: 14px;
+      overflow: hidden;
+      width: 100%
+    }
+
+    .table-head {
+      display: grid;
+      grid-template-columns: 1.2fr.8fr.8fr.6fr.7fr.35fr;
+      background: #FAF8F5;
+      font-size: 7px;
+      font-weight: 700;
+      padding: 6px 3px;
+      text-align: center;
+      color: #9aa0aa;
+      border-bottom: 1px solid #F2EFEA
+    }
+
+    .row-item {
+      display: grid;
+      grid-template-columns: 1.2fr.8fr.8fr.6fr.7fr.35fr;
+      gap: 3px;
+      align-items: center;
+      padding: 4px 2px;
+      border-bottom: 1px solid #FBF9F6;
+      background: #fff
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px">
+    <div style="display:flex;gap:6px;align-items:center">
+      <div style="font-size:10px;font-weight:800">⏱️ الحضور</div>
+      <button onclick="toggleTop()" id="toggleBtn"
+        style="background:#F5F5F4;border:none;padding:3px 7px;border-radius:999px;font-size:7.5px;font-weight:700">▲
+        إخفاء</button>
+    </div>
+    <div style="display:flex;gap:4px;align-items:center">
+      <div id="monthLabel" class="en"
+        style="font-size:8px;background:#111;color:#fff;padding:3px 8px;border-radius:999px">8 / 2025</div>
+      <button onclick="changeMonth(-1)"
+        style="background:#fff;border:1px solid #E7E5E4;width:20px;height:20px;border-radius:6px;font-size:10px">‹</button>
+      <button onclick="changeMonth(1)"
+        style="background:#fff;border:1px solid #E7E5E4;width:20px;height:20px;border-radius:6px;font-size:10px">›</button>
+      <div id="clock" class="en" style="font-size:8px;background:#F5F5F4;padding:3px 6px;border-radius:999px">00:00:00
+      </div>
+    </div>
   </div>
-  <div style="display:flex;gap:4px;align-items:center">
-    <div id="monthLabel" class="en" style="font-size:8px;background:#111;color:#fff;padding:3px 8px;border-radius:999px">8 / 2025</div>
-    <button onclick="changeMonth(-1)" style="background:#fff;border:1px solid #E7E5E4;width:20px;height:20px;border-radius:6px;font-size:10px">‹</button>
-    <button onclick="changeMonth(1)" style="background:#fff;border:1px solid #E7E5E4;width:20px;height:20px;border-radius:6px;font-size:10px">›</button>
-    <div id="clock" class="en" style="font-size:8px;background:#F5F5F4;padding:3px 6px;border-radius:999px">00:00:00</div>
+
+  <div id="topInfo">
+    <div class="stats">
+      <div class="stat"><small>سعر الساعة</small><b id="outPrice" class="en">46.15</b></div>
+      <div class="stat"><small>الساعة</small><input id="v1" type="tel" inputmode="decimal" lang="en" pattern="[0-9]*"
+          class="en" value="1200" oninput="calcTotals()"
+          style="width:100%;border:none;background:transparent;text-align:center;outline:none"></div>
+      <div class="stat"><small>كم يوم</small><input id="v2" type="tel" inputmode="decimal" lang="en" pattern="[0-9]*"
+          class="en" value="26" oninput="calcTotals()"
+          style="width:100%;border:none;background:transparent;text-align:center;outline:none"></div>
+      <div class="stat"><small>عدد الساعات</small><b id="outTotal" class="en">14.16</b></div>
+      <div class="stat"><small>الصافي</small><b id="outSafi" class="en">654</b></div>
+      <div class="stat"><small>المطلوب</small><input id="v3" type="tel" inputmode="decimal" lang="en" pattern="[0-9]*"
+          class="en" value="15000" oninput="calcTotals()"
+          style="width:100%;border:none;background:transparent;text-align:center;outline:none"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:5px 0">
+      <div class="card"
+        style="display:flex;justify-content:space-between;align-items:center;background:#111;color:#fff;border-color:#111;padding:6px 8px">
+        <span style="font-size:8px;opacity:.8">المطلوب يومياً</span>
+        <span id="outDaily" class="en"
+          style="font-weight:800;font-size:9px;background:rgba(255,255,255,.15);padding:2px 6px;border-radius:999px">12.50</span>
+      </div>
+      <button onclick="closeMonth()" id="closeBtn"
+        style="background:#22c55e;color:#fff;border:none;border-radius:11px;padding:6px;font-size:9px;font-weight:800">🔒
+        قفل الشهر وقبضت ✅</button>
+    </div>
+    <div id="closedList" style="margin:5px 0;display:flex;gap:4px;flex-wrap:wrap"></div>
   </div>
-</div>
 
-<div id="topInfo">
-<div class="stats">
-  <div class="stat"><small>سعر الساعة</small><b id="outPrice" class="en">46.15</b></div>
-  <div class="stat"><small>الساعة</small><input id="v1" type="tel" inputmode="decimal" lang="en" pattern="[0-9]*" class="en" value="1200" oninput="calcTotals()" style="width:100%;border:none;background:transparent;text-align:center;outline:none"></div>
-  <div class="stat"><small>كم يوم</small><input id="v2" type="tel" inputmode="decimal" lang="en" pattern="[0-9]*" class="en" value="26" oninput="calcTotals()" style="width:100%;border:none;background:transparent;text-align:center;outline:none"></div>
-  <div class="stat"><small>عدد الساعات</small><b id="outTotal" class="en">14.16</b></div>
-  <div class="stat"><small>الصافي</small><b id="outSafi" class="en">654</b></div>
-  <div class="stat"><small>المطلوب</small><input id="v3" type="tel" inputmode="decimal" lang="en" pattern="[0-9]*" class="en" value="15000" oninput="calcTotals()" style="width:100%;border:none;background:transparent;text-align:center;outline:none"></div>
-</div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:5px 0">
-  <div class="card" style="display:flex;justify-content:space-between;align-items:center;background:#111;color:#fff;border-color:#111;padding:6px 8px">
-    <span style="font-size:8px;opacity:.8">المطلوب يومياً</span>
-    <span id="outDaily" class="en" style="font-weight:800;font-size:9px;background:rgba(255,255,255,.15);padding:2px 6px;border-radius:999px">12.50</span>
+  <div class="table-wrap">
+    <div class="table-head">
+      <div>اليوم</div>
+      <div>حضور</div>
+      <div>انصراف</div>
+      <div>ساعات</div>
+      <div>صافي</div>
+      <div>إجازة</div>
+    </div>
+    <div id="days" style="max-height:55vh;overflow:auto"></div>
   </div>
-  <button onclick="closeMonth()" id="closeBtn" style="background:#22c55e;color:#fff;border:none;border-radius:11px;padding:6px;font-size:9px;font-weight:800">🔒 قفل الشهر وقبضت ✅</button>
-</div>
-<div id="closedList" style="margin:5px 0;display:flex;gap:4px;flex-wrap:wrap"></div>
-</div>
 
-<div class="table-wrap"><div class="table-head"><div>اليوم</div><div>حضور</div><div>انصراف</div><div>ساعات</div><div>صافي</div><div>إجازة</div></div><div id="days" style="max-height:55vh;overflow:auto"></div></div>
+  <script>
+    let topHidden = localStorage.getItem('att_top_hidden') === '1';
+    let curDate = new Date();
+    // الشهر النشط اللي شغالين عليه - مش بيتغير غير لما تقفله
+    let activeKey = localStorage.getItem('att_active_month');
+    if (!activeKey) { activeKey = `${curDate.getFullYear()}-${curDate.getMonth() + 1}`; localStorage.setItem('att_active_month', activeKey); }
+    let [curY, curM] = activeKey.split('-').map(Number); curM = curM - 1;
 
-<script>
-let topHidden=localStorage.getItem('att_top_hidden')==='1';
-let curDate=new Date();
-// الشهر النشط اللي شغالين عليه - مش بيتغير غير لما تقفله
-let activeKey=localStorage.getItem('att_active_month');
-if(!activeKey){ activeKey=`${curDate.getFullYear()}-${curDate.getMonth()+1}`; localStorage.setItem('att_active_month',activeKey); }
-let [curY,curM]=activeKey.split('-').map(Number); curM=curM-1;
+    let closed = JSON.parse(localStorage.getItem('att_closed') || '{}');
 
-let closed=JSON.parse(localStorage.getItem('att_closed')||'{}');
+    function toggleTop() { topHidden = !topHidden; localStorage.setItem('att_top_hidden', topHidden ? '1' : '0'); applyTop(); }
+    function applyTop() { document.getElementById('topInfo').style.display = topHidden ? 'none' : 'block'; document.getElementById('toggleBtn').innerText = topHidden ? '▼ إظهار' : '▲ إخفاء'; }
+    function changeMonth(d) { curM += d; if (curM < 0) { curM = 11; curY--; } if (curM > 11) { curM = 0; curY++; } renderAll(); }
 
-function toggleTop(){topHidden=!topHidden;localStorage.setItem('att_top_hidden',topHidden?'1':'0');applyTop();}
-function applyTop(){document.getElementById('topInfo').style.display=topHidden?'none':'block';document.getElementById('toggleBtn').innerText=topHidden?'▼ إظهار':'▲ إخفاء';}
-function changeMonth(d){curM+=d;if(curM<0){curM=11;curY--;}if(curM>11){curM=0;curY++;}renderAll();}
+    function closeMonth() {
+      let key = `${curY}-${curM + 1}`;
+      if (closed[key]) { alert('الشهر ده مقفول قبل كده'); return; }
+      if (!confirm(`هتقفل شهر ${curM + 1}/${curY} وتسجله انك قبضت؟\nالصافي الحالي: ${document.getElementById('outSafi').innerText} ج`)) return;
+      let totalH = document.getElementById('outTotal').innerText;
+      let totalMoney = document.getElementById('outSafi').innerText;
+      closed[key] = { hours: totalH, money: totalMoney, paidAt: new Date().toLocaleDateString('ar-EG'), required: document.getElementById('v3').value };
+      localStorage.setItem('att_closed', JSON.stringify(closed));
+      // افتح الشهر الجديد
+      curM++; if (curM > 11) { curM = 0; curY++; }
+      activeKey = `${curY}-${curM + 1}`;
+      localStorage.setItem('att_active_month', activeKey);
+      alert(`تم قفل ${key} ✅\nفتحنا لك شهر ${curM + 1}/${curY} الجديد`);
+      renderAll();
+    }
 
-function closeMonth(){
-  let key=`${curY}-${curM+1}`;
-  if(closed[key]){alert('الشهر ده مقفول قبل كده');return;}
-  if(!confirm(`هتقفل شهر ${curM+1}/${curY} وتسجله انك قبضت؟\nالصافي الحالي: ${document.getElementById('outSafi').innerText} ج`)) return;
-  let totalH=document.getElementById('outTotal').innerText;
-  let totalMoney=document.getElementById('outSafi').innerText;
-  closed[key]={hours:totalH,money:totalMoney,paidAt:new Date().toLocaleDateString('ar-EG'),required:document.getElementById('v3').value};
-  localStorage.setItem('att_closed',JSON.stringify(closed));
-  // افتح الشهر الجديد
-  curM++; if(curM>11){curM=0;curY++;}
-  activeKey=`${curY}-${curM+1}`;
-  localStorage.setItem('att_active_month',activeKey);
-  alert(`تم قفل ${key} ✅\nفتحنا لك شهر ${curM+1}/${curY} الجديد`);
-  renderAll();
-}
+    function renderClosedList() {
+      let html = ''; Object.keys(closed).forEach(k => {
+        html += `<span style="font-size:7px;background:#DCFCE7;border:1px solid #BBF7D0;padding:3px 6px;border-radius:999px">🔒 ${k} - ${closed[k].money}ج - قبضت ${closed[k].paidAt}</span>`;
+      });
+      document.getElementById('closedList').innerHTML = html;
+      let curKey = `${curY}-${curM + 1}`;
+      document.getElementById('closeBtn').style.display = closed[curKey] ? 'none' : 'block';
+    }
 
-function renderClosedList(){
-  let html='';Object.keys(closed).forEach(k=>{
-    html+=`<span style="font-size:7px;background:#DCFCE7;border:1px solid #BBF7D0;padding:3px 6px;border-radius:999px">🔒 ${k} - ${closed[k].money}ج - قبضت ${closed[k].paidAt}</span>`;
-  });
-  document.getElementById('closedList').innerHTML=html;
-  let curKey=`${curY}-${curM+1}`;
-  document.getElementById('closeBtn').style.display=closed[curKey]?'none':'block';
-}
-
-let data=JSON.parse(localStorage.getItem('att_fixed_final')||'{}');let hols=JSON.parse(localStorage.getItem('att_hols_fixed')||'{}');
-function toEn(s){return String(s).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[^0-9.:]/g,'');}
-function parseHour(v){if(!v) return 0;v=toEn(v);if(v.includes(':')){let p=v.split(':');return (parseFloat(p[0])||0)+(parseFloat(p[1])||0)/60;}return parseFloat(v)||0;}
-function calcDiff(a,b){if(!a||!b) return 0;let s=parseHour(a),e=parseHour(b);if(e<s) e+=12;let d=e-s;if(d<0) d+=24;if(d>12) d-=12;return d>0?d:0;}
-function renderAll(){
-  const list=document.getElementById('days');
-  document.getElementById('monthLabel').innerText=`${curM+1} / ${curY} ${activeKey===`${curY}-${curM+1}`?'• نشط':''}`;
-  const y=curY,m=curM;const now=new Date();const isThisMonth=y===now.getFullYear()&&m===now.getMonth();
-  const dim=new Date(y,m+1,0).getDate();const today=isThisMonth?now.getDate():-1;
-  const price=(parseFloat(toEn(document.getElementById('v1').value))||0)/(parseFloat(toEn(document.getElementById('v2').value))||1);
-  let html='';
-  for(let i=1;i<=dim;i++){
-    const dt=new Date(y,m,i);const key=`${y}-${m+1}-${i}`;
-    const rec=data[key]||{in:'',out:''};const isHol=hols[key];
-    const hours=calcDiff(rec.in,rec.out);const safi=hours*price;
-    const dayAr=['أحد','إثنين','ثلاثاء','أربعاء','خميس','جمعة','سبت'][dt.getDay()];
-    const bg=isHol?'#F3F4F6':i===today?'#FFFBEB':i%2===0?'#FAF8F5':'#fff';
-    const isClosed=!!closed[`${y}-${m+1}`];
-    html+=`<div class="row-item" style="background:${bg};${isHol?'opacity:.5':''}${isClosed?'opacity:.6':''}">
-      <div style="font-size:8px;padding-right:2px">${dayAr} <span class="en" style="font-size:6.5px;color:#9aa0aa">(${i}/${m+1})</span></div>
-      <input id="in-${key}" type="tel" inputmode="decimal" lang="en" pattern="[0-9.:]*" class="time-box en" value="${rec.in}" placeholder="7" ${isHol||isClosed?'disabled':''} oninput="saveD('${key}','in',this.value)">
-      <input id="out-${key}" type="tel" inputmode="decimal" lang="en" pattern="[0-9.:]*" class="time-box en" value="${rec.out}" placeholder="19" ${isHol||isClosed?'disabled':''} oninput="saveD('${key}','out',this.value)">
-      <div id="h-${key}" class="en" style="font-size:8.5px;font-weight:700;color:${hours?'#111':'#cbd5e1'}">${isHol?'-':hours?hours.toFixed(2):'-'}</div>
-      <div id="s-${key}" class="en" style="font-size:8.5px;font-weight:800;color:${safi?'#059669':'#cbd5e1'}">${isHol?'-':safi?Math.round(safi):'-'}</div>
-      <button onclick="toggleHol('${key}')" ${isClosed?'disabled':''} style="border:none;background:${isHol?'#22c55e':'#E7E5E4'};width:18px;height:18px;border-radius:5px;font-size:8px;color:${isHol?'#fff':'#6b7280'}">${isHol?'✓':'○'}</button>
+    let data = JSON.parse(localStorage.getItem('att_fixed_final') || '{}'); let hols = JSON.parse(localStorage.getItem('att_hols_fixed') || '{}');
+    function toEn(s) { return String(s).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[^0-9.:]/g, ''); }
+    function parseHour(v) { if (!v) return 0; v = toEn(v); if (v.includes(':')) { let p = v.split(':'); return (parseFloat(p[0]) || 0) + (parseFloat(p[1]) || 0) / 60; } return parseFloat(v) || 0; }
+    function calcDiff(a, b) { if (!a || !b) return 0; let s = parseHour(a), e = parseHour(b); if (e < s) e += 12; let d = e - s; if (d < 0) d += 24; if (d > 12) d -= 12; return d > 0 ? d : 0; }
+    function renderAll() {
+      const list = document.getElementById('days');
+      document.getElementById('monthLabel').innerText = `${curM + 1} / ${curY} ${activeKey === `${curY}-${curM + 1}` ? '• نشط' : ''}`;
+      const y = curY, m = curM; const now = new Date(); const isThisMonth = y === now.getFullYear() && m === now.getMonth();
+      const dim = new Date(y, m + 1, 0).getDate(); const today = isThisMonth ? now.getDate() : -1;
+      const price = (parseFloat(toEn(document.getElementById('v1').value)) || 0) / (parseFloat(toEn(document.getElementById('v2').value)) || 1);
+      let html = '';
+      for (let i = 1; i <= dim; i++) {
+        const dt = new Date(y, m, i); const key = `${y}-${m + 1}-${i}`;
+        const rec = data[key] || { in: '', out: '' }; const isHol = hols[key];
+        const hours = calcDiff(rec.in, rec.out); const safi = hours * price;
+        const dayAr = ['أحد', 'إثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'][dt.getDay()];
+        const bg = isHol ? '#F3F4F6' : i === today ? '#FFFBEB' : i % 2 === 0 ? '#FAF8F5' : '#fff';
+        const isClosed = !!closed[`${y}-${m + 1}`];
+        html += `<div class="row-item" style="background:${bg};${isHol ? 'opacity:.5' : ''}${isClosed ? 'opacity:.6' : ''}">
+      <div style="font-size:8px;padding-right:2px">${dayAr} <span class="en" style="font-size:6.5px;color:#9aa0aa">(${i}/${m + 1})</span></div>
+      <input id="in-${key}" type="tel" inputmode="decimal" lang="en" pattern="[0-9.:]*" class="time-box en" value="${rec.in}" placeholder="7" ${isHol || isClosed ? 'disabled' : ''} oninput="saveD('${key}','in',this.value)">
+      <input id="out-${key}" type="tel" inputmode="decimal" lang="en" pattern="[0-9.:]*" class="time-box en" value="${rec.out}" placeholder="19" ${isHol || isClosed ? 'disabled' : ''} oninput="saveD('${key}','out',this.value)">
+      <div id="h-${key}" class="en" style="font-size:8.5px;font-weight:700;color:${hours ? '#111' : '#cbd5e1'}">${isHol ? '-' : hours ? hours.toFixed(2) : '-'}</div>
+      <div id="s-${key}" class="en" style="font-size:8.5px;font-weight:800;color:${safi ? '#059669' : '#cbd5e1'}">${isHol ? '-' : safi ? Math.round(safi) : '-'}</div>
+      <button onclick="toggleHol('${key}')" ${isClosed ? 'disabled' : ''} style="border:none;background:${isHol ? '#22c55e' : '#E7E5E4'};width:18px;height:18px;border-radius:5px;font-size:8px;color:${isHol ? '#fff' : '#6b7280'}">${isHol ? '✓' : '○'}</button>
     </div>`;
-  }
-  list.innerHTML=html;calcTotals();renderClosedList();
-}
-function saveD(k,t,v){let clean=toEn(v);if(!data[k]) data[k]={in:'',out:''};data[k][t]=clean;localStorage.setItem('att_fixed_final',JSON.stringify(data));calcTotals();}
-function toggleHol(k){if(hols[k]) delete hols[k]; else hols[k]=true;localStorage.setItem('att_hols_fixed',JSON.stringify(hols));renderAll();}
-function calcTotals(){
-  let v1=parseFloat(toEn(document.getElementById('v1').value))||0;let v2=parseFloat(toEn(document.getElementById('v2').value))||1;let total=0;
-  Object.entries(data).forEach(([k,r])=>{let [yy,mm]=k.split('-').map(Number);if(yy===curY&&mm===curM+1&&!hols[k]) total+=calcDiff(r.in,r.out);});
-  const price=v2?v1/v2:0;const v3=parseFloat(toEn(document.getElementById('v3').value))||0;
-  document.getElementById('outPrice').innerText=price.toFixed(2);
-  document.getElementById('outTotal').innerText=total.toFixed(2);
-  document.getElementById('outSafi').innerText=Math.round(total*price).toString();
-  document.getElementById('outDaily').innerText=price&&v2?(v3/price/v2).toFixed(2):'0.00';
-}
-function addNow(){const n=new Date();const k=`${n.getFullYear()}-${n.getMonth()+1}-${n.getDate()}`;const t=(n.getHours()+n.getMinutes()/60).toFixed(2);if(!data[k]) data[k]={in:'',out:''};if(!data[k].in) data[k].in=t;else data[k].out=t;localStorage.setItem('att_fixed_final',JSON.stringify(data));let [ay,am]=activeKey.split('-').map(Number);curY=ay;curM=am-1;renderAll();}
-setInterval(()=>{const el=document.getElementById('clock');if(el) el.innerText=new Date().toLocaleTimeString('en-GB',{hour12:false});},1000);
-applyTop();renderAll();
-</script></body></html>
+      }
+      list.innerHTML = html; calcTotals(); renderClosedList();
+    }
+    function saveD(k, t, v) { let clean = toEn(v); if (!data[k]) data[k] = { in: '', out: '' }; data[k][t] = clean; localStorage.setItem('att_fixed_final', JSON.stringify(data)); calcTotals(); }
+    function toggleHol(k) { if (hols[k]) delete hols[k]; else hols[k] = true; localStorage.setItem('att_hols_fixed', JSON.stringify(hols)); renderAll(); }
+    function calcTotals() {
+      let v1 = parseFloat(toEn(document.getElementById('v1').value)) || 0; let v2 = parseFloat(toEn(document.getElementById('v2').value)) || 1; let total = 0;
+      Object.entries(data).forEach(([k, r]) => { let [yy, mm] = k.split('-').map(Number); if (yy === curY && mm === curM + 1 && !hols[k]) total += calcDiff(r.in, r.out); });
+      const price = v2 ? v1 / v2 : 0; const v3 = parseFloat(toEn(document.getElementById('v3').value)) || 0;
+      document.getElementById('outPrice').innerText = price.toFixed(2);
+      document.getElementById('outTotal').innerText = total.toFixed(2);
+      document.getElementById('outSafi').innerText = Math.round(total * price).toString();
+      document.getElementById('outDaily').innerText = price && v2 ? (v3 / price / v2).toFixed(2) : '0.00';
+    }
+    function addNow() { const n = new Date(); const k = `${n.getFullYear()}-${n.getMonth() + 1}-${n.getDate()}`; const t = (n.getHours() + n.getMinutes() / 60).toFixed(2); if (!data[k]) data[k] = { in: '', out: '' }; if (!data[k].in) data[k].in = t; else data[k].out = t; localStorage.setItem('att_fixed_final', JSON.stringify(data)); let [ay, am] = activeKey.split('-').map(Number); curY = ay; curM = am - 1; renderAll(); }
+    setInterval(() => { const el = document.getElementById('clock'); if (el) el.innerText = new Date().toLocaleTimeString('en-GB', { hour12: false }); }, 1000);
+    applyTop(); renderAll();
+  </script>
+</body>
+
+</html>
