@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;font-family:'IBM Plex Sans Arabic',sans-serif}body{margin:0;background:#f5f6f8;padding-bottom:90px}.en{font-family:monospace!important;direction:ltr!important}
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;font-family:'IBM Plex Sans Arabic',sans-serif}body{margin:0;background:#e5e7eb;display:flex;justify-content:center;min-height:100vh;padding:12px}.phone{width:390px;max-width:100%;background:#fff;border:8px solid #111;border-radius:28px;overflow:hidden;position:relative;min-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 40px rgba(0,0,0,.15)}.phone.tabs{border-radius:0}.phone.fab{position:absolute}.phone.modal{position:absolute}.en{font-family:monospace!important;direction:ltr!important}
 .tabs{display:flex;gap:5px;padding:10px;background:#fff;position:sticky;top:0;z-index:30;border-bottom:1px solid #f0f0f0}
 .tab{flex:1;min-width:0;padding:10px 4px;border-radius:999px;border:1px solid #e9eaec;background:#f7f7f8;color:#7a7e87;font-size:11px;font-weight:700;transition:.2s;cursor:pointer;white-space:nowrap;text-align:center}
 .tab.active{background:#111;color:#fff;border-color:#111}
@@ -28,8 +28,7 @@ function syncToSheet(row, sheetName='daily'){
   }catch(e){console.log('sync error', e)}
 }
 </script>
-</head><body>
-<div class="tabs">
+</head><body><div class="phone"><div class="tabs">
   <button class="tab active" id="tab-income" onclick="showMain('income')">دخل</button>
   <button class="tab" id="tab-expense" onclick="showMain('expense')">مصروف</button>
   <button class="tab" id="tab-debt" onclick="showMain('debt')">ديون</button>
@@ -75,7 +74,7 @@ function syncToSheet(row, sheetName='daily'){
   <div id="previewArea" style="display:none;margin-top:10px;"><div id="imgPreview"></div><div id="audioPreview" style="margin-top:6px;"></div></div>
   <button class="save-btn" onclick="doSave()">💾 حفظ العملية</button>
 </div></div>
-<div class="input-modal" id="inputModal"><div class="input-box"><b id="inputTitle" style="font-size:11px">اسم</b><input id="inputField"><div id="inputExtra"></div><div style="display:flex;gap:8px;margin-top:10px;"><button onclick="closeInputModal()" style="flex:1;padding:10px;border-radius:8px;border:1px solid #ececef;background:#fff;font-weight:700;font-size:9px">إلغاء</button><button onclick="confirmInputModal()" style="flex:1;padding:10px;border-radius:8px;border:none;background:#111;color:#fff;font-weight:700;font-size:9px">حفظ</button></div></div></div>
+</div><div id="inputModal" class="input-modal"><div class="input-box"><b id="inputTitle" style="font-size:11px">اسم</b><input id="inputField"><div id="inputExtra"></div><div style="display:flex;gap:8px;margin-top:10px;"><button onclick="closeInputModal()" style="flex:1;padding:10px;border-radius:8px;border:1px solid #ececef;background:#fff;font-weight:700;font-size:9px">إلغاء</button><button onclick="confirmInputModal()" style="flex:1;padding:10px;border-radius:8px;border:none;background:#111;color:#fff;font-weight:700;font-size:9px">حفظ</button></div></div></div>
 <div id="toast" class="toast"></div>
 <script>
 const fmt=n=>{let x=+String(n).replace(/,/g,'');if(!x&&x!==0) return '0';return Math.round(x).toLocaleString('en-US');};
@@ -178,7 +177,6 @@ function doSave(){
     }
 
     localStorage.setItem('master_final',JSON.stringify(db));localStorage.setItem('daily_trans_v2',JSON.stringify(trans));localStorage.setItem('debts_pro_v2',JSON.stringify(debts));
-    // مزامنة مع الشيت العربي الجديد RTL
     try{
       let sheetRow = {
         'المعرف': Date.now(),
