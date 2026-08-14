@@ -1,30 +1,338 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<style>
-*{box-sizing:border-box;font-family:'IBM Plex Sans Arabic',sans-serif}
-body{margin:0;background:#fff;padding-bottom:70px}
-.tabs{display:flex;gap:5px;padding:10px;background:#fff;position:sticky;top:0;z-index:10;border-bottom:1px solid #f0f0f0}
-.tab{flex:1;padding:10px 4px;border-radius:999px;border:1px solid #e9eaec;background:#f7f7f8;color:#7a7e87;font-size:11px;font-weight:700;cursor:pointer;text-align:center}
-.tab.active{background:#111;color:#fff}
-.view{display:none}.view.active{display:block}
-.save-btn{width:100%;padding:14px;border-radius:12px;border:none;background:#111;color:#fff;font-size:14px;font-weight:800;margin-top:11px;position:sticky;bottom:0;z-index:5}
-.media-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-top:10px}
-.media-btn{height:36px;border-radius:10px;border:1px solid #ececef;background:#f7f7f8;display:flex;align-items:center;justify-content:center;gap:5px;font-size:9px;font-weight:700;cursor:pointer}
-</style>
-<script>
-const API_URL = "https://script.google.com/macros/s/AKfycbw-fO9Xzi2jQhEm5Yy-wgVr4gNLW2wFu6uNquTcDN6ZsFdYOiMjv9E_QKwzyM5DXySDiQ/exec";
-function syncToSheet(row){fetch(API_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'add',sheet:'daily',row:row})});}
-</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'IBM Plex Sans Arabic', sans-serif
+    }
+
+    body {
+      margin: 0;
+      background: #fff;
+      padding-bottom: 90px
+    }
+
+    .tabs {
+      display: flex;
+      gap: 5px;
+      padding: 10px;
+      background: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      border-bottom: 1px solid #f0f0f0
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px 4px;
+      border-radius: 999px;
+      border: 1px solid #e9eaec;
+      background: #f7f7f8;
+      color: #7a7e87;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center
+    }
+
+    .tab.active {
+      background: #111;
+      color: #fff;
+      border-color: #111
+    }
+
+    .view {
+      display: block;
+      padding: 10px
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #f0f0f0;
+      border-radius: 14px;
+      padding: 10px;
+      margin-bottom: 10px
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 10px
+    }
+
+    .stat {
+      background: #f7f7f8;
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #f0f0f0
+    }
+
+    .stat b {
+      display: block;
+      margin-top: 4px;
+      font-size: 13px
+    }
+
+    .stat small {
+      font-size: 8px;
+      color: #8b8f98
+    }
+
+    .fab {
+      position: fixed;
+      bottom: 86px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #111;
+      color: #fff;
+      border: none;
+      font-size: 28px;
+      z-index: 50;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+      cursor: pointer
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, .55);
+      display: none;
+      align-items: end;
+      justify-content: center;
+      z-index: 100
+    }
+
+    .modal.active {
+      display: flex
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 390px;
+      background: #fff;
+      border-radius: 18px 18px 0 0;
+      padding: 14px;
+      max-height: 92vh;
+      overflow: auto;
+      display: flex;
+      flex-direction: column
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px
+    }
+
+    .row label {
+      font-size: 8px;
+      color: #6b7280;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 4px
+    }
+
+    .row input,
+    .row select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ececef;
+      background: #f7f7f8;
+      font-size: 10px
+    }
+
+    .media-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 7px;
+      margin-top: 12px
+    }
+
+    .media-btn {
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid #ececef;
+      background: #f7f7f8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-size: 9px;
+      font-weight: 700;
+      cursor: pointer
+    }
+
+    .save-wrap {
+      position: sticky;
+      bottom: 0;
+      background: #fff;
+      padding: 12px 0 4px 0;
+      margin-top: 16px;
+      border-top: 1px solid #f0f0f0;
+      z-index: 10
+    }
+
+    .save-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 12px;
+      border: none;
+      background: #111;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer
+    }
+
+    .bottom-nav {
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0 12px;
+      background: #fff;
+      border-top: 1px solid #f0f0f0;
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 390px;
+      z-index: 40
+    }
+
+    .nav-item {
+      flex: 1;
+      text-align: center;
+      font-size: 8px;
+      color: #9aa0aa;
+      cursor: pointer
+    }
+
+    .nav-item.active {
+      color: #111;
+      font-weight: 700
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111;
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 10px;
+      display: none;
+      z-index: 200
+    }
+
+    .toast.show {
+      display: block
+    }
+  </style>
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbw-fO9Xzi2jQhEm5Yy-wgVr4gNLW2wFu6uNquTcDN6ZsFdYOiMjv9E_QKwzyM5DXySDiQ/exec";
+    function syncToSheet(row) { fetch(API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'add', sheet: 'daily', row: row }) }); }
+  </script>
 </head>
+
 <body>
-<!-- مفيش div class="phone" هنا - الفريم موجود في index.html بس -->
-<div class="tabs"><button class="tab active">دخل</button><button class="tab">مصروف</button><button class="tab">ديون</button><button class="tab">أمانات</button><button class="tab">الإجمالي</button></div>
-<div id="form-income-expense">
-  <div class="media-row"><button class="media-btn">📷 كاميرا</button><button class="media-btn">🎤 صوت</button><button class="media-btn">📅 اليوم</button></div>
-  <button class="save-btn">💾 حفظ العملية</button>
-</div>
+
+  <div class="tabs">
+    <button class="tab active">دخل</button>
+    <button class="tab">مصروف</button>
+    <button class="tab">ديون</button>
+    <button class="tab">أمانات</button>
+    <button class="tab">الإجمالي</button>
+  </div>
+
+  <div class="view">
+    <div class="stats">
+      <div class="stat"><small>اليوم</small><b>0</b></div>
+      <div class="stat"><small>الشهر</small><b>0</b></div>
+      <div class="stat"><small>كاش</small><b>0</b></div>
+    </div>
+    <div class="card">🔍 بحث...</div>
+    <div class="card" style="text-align:center;color:#9aa0aa;padding:20px">لا يوجد معاملات</div>
+  </div>
+
+  <!-- زرار الإضافة + -->
+  <button class="fab" onclick="document.getElementById('addModal').classList.add('active')">+</button>
+
+  <!-- نافذة الإضافة -->
+  <div id="addModal" class="modal">
+    <div class="modal-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <b style="font-size:14px">إضافة</b>
+        <button onclick="document.getElementById('addModal').classList.remove('active')"
+          style="border:none;background:#f5f5f5;width:26px;height:26px;border-radius:50%">✕</button>
+      </div>
+
+      <div class="row">
+        <div><label>المحفظة</label><select id="ae-wallet">
+            <option>كاش</option>
+            <option>بنك</option>
+          </select></div>
+        <div><label>القيمة</label><input id="ae-amount" type="tel" inputmode="numeric" placeholder="0"></div>
+      </div>
+      <div class="row">
+        <div><label>البند</label><select id="ae-cat">
+            <option>المرتب</option>
+            <option>إيجار</option>
+          </select></div>
+        <div><label>التاريخ</label><input id="ae-date" type="date"></div>
+      </div>
+      <div class="row">
+        <div><label>ملاحظة</label><input id="ae-note" placeholder="..."></div>
+      </div>
+
+      <div class="media-row">
+        <button type="button" class="media-btn" onclick="alert('كاميرا')">📷 كاميرا</button>
+        <button type="button" class="media-btn" onclick="alert('صوت')">🎤 صوت</button>
+        <button type="button" class="media-btn" onclick="document.getElementById('ae-date').valueAsDate=new Date()">📅
+          اليوم</button>
+      </div>
+
+      <!-- زرار حفظ العملية - ثابت وظاهر -->
+      <div class="save-wrap">
+        <button class="save-btn" onclick="doSave()">💾 حفظ العملية</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item">📝<br>المهام</div>
+    <div class="nav-item">⏱️<br>الحضور</div>
+    <div class="nav-item active">📅<br>اليومية</div>
+    <div class="nav-item">🏠<br>الرئيسية</div>
+  </div>
+
+  <div id="toast" class="toast">تم الحفظ ✅</div>
+
+  <script>
+    function doSave() {
+      let amount = document.getElementById('ae-amount').value || 0;
+      if (!amount) { alert('اكتب القيمة'); return; }
+      syncToSheet({ 'المعرف': Date.now(), 'التاريخ': new Date().toISOString().split('T')[0], 'النوع': 'دخل', 'البند': 'المرتب', 'المبلغ': amount, 'المحفظة': 'كاش', 'ملاحظات': document.getElementById('ae-note').value });
+      document.getElementById('addModal').classList.remove('active');
+      let t = document.getElementById('toast'); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
+      document.getElementById('ae-amount').value = '';
+    }
+    document.getElementById('ae-date').valueAsDate = new Date();
+  </script>
+
 </body>
+
 </html>
