@@ -89,6 +89,30 @@
       aspect-ratio: 3/4;
       object-fit: cover
     }
+
+    .hidden-note {
+      background: #111;
+      color: #fff;
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 8px;
+      border: 1px solid #222
+    }
+
+    #deleteWarningModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .65);
+      z-index: 11000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px
+    }
+
+    #deleteWarningModal.show {
+      display: flex
+    }
   </style>
 </head>
 
@@ -97,8 +121,8 @@
     <div
       style="padding:14px 16px;border-bottom:1px solid #F2EFEA;display:flex;justify-content:space-between;align-items:center;">
       <div style="display:flex;gap:10px;align-items:center;">
-        <div
-          style="width:40px;height:40px;background:#111;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;">
+        <div id="vaultTrigger"
+          style="width:40px;height:40px;background:#111;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;user-select:none">
           ✦</div>
         <div>
           <div style="font-weight:700;">مساحة العمل</div>
@@ -106,13 +130,13 @@
         </div>
       </div>
       <div style="display:flex;gap:6px;"><button onclick="openManager()"
-          style="background:#F5F5F4;border:none;padding:9px 12px;border-radius:10px;font-size:12px;">⚙️
+          style="background:#F5F5F4;border:none;padding:9px 12px;border-radius:10px;font-size:12px;">⚙
           إدارة</button><button onclick="addQuick()"
           style="background:#111;color:#fff;border:none;padding:9px 14px;border-radius:10px;font-weight:700;">+
           جديد</button></div>
     </div>
     <div style="padding:12px;background:#FAFAF9;border-bottom:1px solid #F2EFEA;"><input id="mainInput"
-        placeholder="ماذا تريد أن تنجز؟"
+        placeholder="ماذا تريد أن تنجز؟ (اكتب خفي)"
         style="width:100%;background:#fff;border:1px solid #E7E5E4;padding:12px;border-radius:12px;font-size:14px;outline:none;">
       <div style="display:flex;gap:8px;margin-top:10px;align-items:center;"><select id="cat"
           style="flex:1;background:#fff;border:1px solid #E7E5E4;border-radius:10px;padding:10px;font-size:13px;"></select>
@@ -124,6 +148,40 @@
     <div id="board"
       style="flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:#FBF9F6;"
       class="nu-scroll"></div>
+  </div>
+
+  <!-- مودال تحذير المسح الجديد -->
+  <div id="deleteWarningModal" onclick="if(event.target==this)closeDeleteWarning()">
+    <div
+      style="background:#fff;width:100%;max-width:380px;border-radius:22px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+      <div style="background:#FEF2F2;padding:18px;text-align:center;border-bottom:1px solid #FECACA">
+        <div
+          style="width:56px;height:56px;background:#FEE2E2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:28px">
+          ⚠️</div>
+        <div style="font-weight:900;font-size:16px;color:#991B1B">تحذير! هتحذف المهمة نهائياً؟</div>
+        <div style="font-size:11px;color:#B91C1C;margin-top:4px">العملية لا يمكن التراجع عنها</div>
+      </div>
+      <div style="padding:16px">
+        <div id="delTaskPreview"
+          style="background:#FAFAF9;border:1px solid #F2EFEA;border-radius:12px;padding:12px;margin-bottom:12px"></div>
+        <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:10px;margin-bottom:12px">
+          <div style="font-size:11px;font-weight:700;margin-bottom:6px">سيتم حذف:</div>
+          <div id="delDetails" style="font-size:11px;color:#92400E;line-height:1.6"></div>
+        </div>
+        <label
+          style="display:flex;gap:8px;align-items:center;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:10px;cursor:pointer">
+          <input type="checkbox" id="delConfirmCheck" onchange="toggleDelBtn()" style="width:16px;height:16px">
+          <span style="font-size:12px;font-weight:600">أنا متأكد عايز أمسح المهمة دي نهائياً</span>
+        </label>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button onclick="closeDeleteWarning()"
+            style="flex:1;background:#F5F5F4;border:none;padding:12px;border-radius:11px;font-weight:700">إلغاء</button>
+          <button id="finalDelBtn" onclick="confirmDelete()" disabled
+            style="flex:1;background:#E5E7EB;color:#9CA3AF;border:none;padding:12px;border-radius:11px;font-weight:800;cursor:not-allowed">🗑
+            حذف نهائي</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div id="managerModal"
@@ -167,7 +225,7 @@
       </h2>
       <div style="background:#fff;border:1px solid #F2EFEA;border-radius:16px;padding:10px;margin-bottom:12px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><b
-            style="font-size:12px;">✔️ مهام فرعية</b><span id="subProgress"
+            style="font-size:12px;">✔ مهام فرعية</b><span id="subProgress"
             style="font-size:11px;background:#F5F5F4;padding:2px 8px;border-radius:20px;">0/0</span></div>
         <div id="subList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px;"></div>
         <div style="display:flex;gap:6px;"><input id="subInput" placeholder="مهمة فرعية + Enter"
@@ -179,25 +237,25 @@
           <div id="subBar" style="height:100%;width:0%;background:#111;"></div>
         </div>
       </div>
-
       <div
         style="display:flex;gap:4px;background:#F5F5F4;padding:4px;border-radius:12px;margin-bottom:10px;overflow:auto;"
         class="nu-scroll">
         <button onclick="tab('colors')" id="tColors" class="tab active">🎨 ألوان</button>
         <button onclick="tab('camera')" id="tCamera" class="tab">📷 كاميرا</button>
-        <button onclick="tab('draw')" id="tDraw" class="tab">✏️ رسم</button>
-        <button onclick="tab('voice')" id="tVoice" class="tab">🎙️ فويس</button>
+        <button onclick="tab('draw')" id="tDraw" class="tab">✏ رسم</button>
+        <button onclick="tab('voice')" id="tVoice" class="tab">🎙 فويس</button>
         <button onclick="tab('note')" id="tNote" class="tab">📝 نوت</button>
         <button onclick="tab('rem')" id="tRem" class="tab">⏰ منبه</button>
+        <button onclick="tab('hidden')" id="tHidden" class="tab" style="display:none;background:#000;color:#fff">🔒
+          الخفي</button>
       </div>
-
       <div id="pColors">
         <div
           style="display:flex;gap:8px;align-items:center;background:#F5F5F4;padding:10px;border-radius:12px;margin-bottom:8px;">
           <div style="font-size:11px;font-weight:700;">اللون الحالي:</div>
           <div id="currentColorPreview"
-            style="width:28px;height:28px;border-radius:8px;border:1px solid #ddd;background:#fff"></div>
-          <button onclick="toggleAllColors()"
+            style="width:28px;height:28px;border-radius:8px;border:1px solid #ddd;background:#fff"></div><button
+            onclick="toggleAllColors()"
             style="margin-right:auto;background:#fff;border:1px solid #E7E5E4;padding:6px 10px;border-radius:8px;font-size:11px;">عرض
             كل الألوان ▼</button>
         </div>
@@ -209,19 +267,17 @@
           <div style="display:flex;gap:6px;align-items:center;margin-top:8px;">
             <div onclick="selectModalColor('transparent')"
               style="width:32px;height:32px;border-radius:6px;background:#fff;border:2px dashed #999;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer">
-              بلا</div>
-            <input type="color" id="customColor" value="#ff0000" onchange="selectModalColor(this.value)"
-              style="width:36px;height:32px;border:none;border-radius:6px;">
-            <span style="font-size:10px;color:#888;">لون مخصص</span>
+              بلا</div><input type="color" id="customColor" value="#ff0000" onchange="selectModalColor(this.value)"
+              style="width:36px;height:32px;border:none;border-radius:6px;"><span style="font-size:10px;color:#888;">لون
+              مخصص</span>
           </div>
         </div>
       </div>
-
       <div id="pCamera" style="display:none;">
         <div style="display:flex;gap:6px;margin-bottom:8px;"><button onclick="openCamera()"
             style="flex:1;background:#111;color:#fff;border:none;padding:10px;border-radius:10px;font-weight:700;">📷
             فتح الكاميرا</button><button onclick="document.getElementById('task-photo-file').click()"
-            style="flex:1;background:#F5F5F4;border:none;padding:10px;border-radius:10px;font-weight:700;">🖼️ من
+            style="flex:1;background:#F5F5F4;border:none;padding:10px;border-radius:10px;font-weight:700;">🖼 من
             المعرض</button><input type="file" id="task-photo-file" accept="image/*" style="display:none"
             onchange="handleFile(this)"></div>
         <div id="cameraBox" style="display:none;"><video id="cameraVideo" autoplay playsinline></video><canvas
@@ -234,7 +290,6 @@
         </div>
         <div id="photoGallery" style="display:flex;gap:8px;overflow:auto;flex-wrap:wrap;margin-top:10px;"></div>
       </div>
-
       <div id="pDraw" style="display:none;"><canvas id="canvas"
           style="width:100%;height:180px;border:2px dashed #E7E5E4;border-radius:12px;"></canvas>
         <div style="display:flex;gap:8px;margin-top:8px;align-items:center;"><input type="color" id="penColor"
@@ -291,17 +346,56 @@
           </div>
         </div>
       </div>
+
+      <div id="pHidden" style="display:none;">
+        <div id="hiddenAuth"
+          style="background:#0F0F0F;border-radius:16px;padding:16px;color:#fff;border:1px solid #222">
+          <div style="text-align:center;padding:10px">
+            <div style="font-size:40px">🔒</div>
+            <div style="font-weight:800;margin-top:6px" id="hAuthTitle">تبويب الخفي محمي</div>
+            <div style="font-size:11px;color:#777;margin-top:4px">مشفر AES-256 • محدش يقدر يوصله غيرك</div>
+          </div>
+          <input id="hPass" type="password" placeholder="اكتب رمز الخفي"
+            style="width:100%;background:#1A1A1A;border:1px solid #2A2A2A;padding:13px;border-radius:11px;color:#fff;text-align:center;letter-spacing:3px;margin-top:12px;outline:none">
+          <button onclick="unlockHidden()"
+            style="width:100%;margin-top:10px;background:#fff;color:#000;border:none;padding:12px;border-radius:11px;font-weight:800">فتح
+            التبويب 🔓</button>
+          <div id="hErr" style="color:#ff5a5a;font-size:11px;text-align:center;margin-top:8px;display:none"></div>
+          <div style="font-size:10px;color:#555;text-align:center;margin-top:10px">أول مرة؟ اكتب رمز جديد وهيتعمل تلقائي
+          </div>
+        </div>
+        <div id="hiddenContent" style="display:none">
+          <div style="background:#0F0F0F;border-radius:16px;padding:12px;border:1px solid #222;margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b
+                style="font-size:13px">📓 نوتس الخفي</b>
+              <div style="display:flex;gap:6px"><button onclick="addHiddenNote()"
+                  style="background:#fff;color:#000;border:none;padding:7px 12px;border-radius:8px;font-weight:800;font-size:11px">+
+                  نوت</button><button onclick="hideHiddenTab()"
+                  style="background:#1A1A1A;border:1px solid #2A2A2A;color:#fff;padding:7px 10px;border-radius:8px;font-size:11px">إخفاء
+                  👁️‍🗨️</button></div>
+            </div>
+            <input id="hSearch" placeholder="بحث..." oninput="renderHidden()"
+              style="width:100%;background:#1A1A1A;border:1px solid #2A2A2A;padding:9px 12px;border-radius:9px;color:#fff;font-size:12px;margin-bottom:10px">
+            <div id="hList" style="max-height:52vh;overflow:auto" class="nu-scroll"></div>
+            <div style="display:flex;justify-content:space-between;margin-top:10px"><span id="hCount"
+                style="font-size:10px;color:#666"></span><button onclick="lockHidden()"
+                style="background:#1A1A1A;border:1px solid #333;color:#fff;padding:6px 12px;border-radius:8px;font-size:10px">🔒
+                قفل</button></div>
+          </div>
+        </div>
+      </div>
+
     </div>
     <div style="padding:10px 12px;border-top:1px solid #F2EFEA;display:flex;gap:8px;"><button onclick="deleteCurrent()"
-        style="background:#FFF1F2;color:#ef4444;border:1px solid #FECDD3;padding:10px 14px;border-radius:10px;flex:1;">🗑️
+        style="background:#FFF1F2;color:#ef4444;border:1px solid #FECDD3;padding:10px 14px;border-radius:10px;flex:1;font-weight:700">🗑
         حذف</button><button onclick="toggleDone()" id="doneBtn"
         style="background:#111;color:#fff;border:none;padding:10px 14px;border-radius:10px;font-weight:700;flex:2;">تم
         ✓</button></div>
   </div>
 
   <script>
-    function fmt(n) { if (n === '' || n == null) return ''; let x = typeof n === 'string' ? parseFloat(n.toString().replace(/,/g, '')) : n; if (isNaN(x)) return n; return x.toLocaleString('en-US'); }
-    function formatTextNumbers(t) { return t.replace(/\b\d{4,}\b/g, m => fmt(m)); }
+    function fmt(n) { if (n === '' || n == null) return ''; let x = typeof n === 'string' ? parseFloat(n.toString().replace(/,/g, '')) : n; if (isNaN(x)) return n; return x.toLocaleString('en-US') }
+    function formatTextNumbers(t) { return t.replace(/\b\d{4,}\b/g, m => fmt(m)) }
     const themeColors = [["#70AD47", "#5B9BD5", "#FFC000", "#A5A5A5", "#ED7D31", "#4472C4", "#2F5597", "#D9D9D9", "#000000", "#FFFFFF"], ["#E2EFDA", "#D6EAF8", "#FFF2CC", "#F2F2F2", "#FCE4D6", "#D9E2F3", "#D6DCE4", "#EDEDED", "#808080", "#F2F2F2"], ["#C6E0B4", "#BDD7EE", "#FFE699", "#D9D9D9", "#F8CBAD", "#B4C6E7", "#ACB9CA", "#BFBFBF", "#595959", "#D9D9D9"], ["#A9D08E", "#9BC2E6", "#FFD966", "#BFBFBF", "#F4B084", "#8EA9DB", "#7F8EA6", "#808080", "#262626", "#BFBFBF"], ["#548235", "#2E75B6", "#BF8F00", "#7F7F7F", "#C55A11", "#305496", "#203764", "#404040", "#0D0D0D", "#7F7F7F"], ["#375623", "#1F4E79", "#7F6003", "#595959", "#833C0B", "#203764", "#152238", "#000000", "#404040"]];
     const standardColors = ["#7030A0", "#002060", "#0070C0", "#00B0F0", "#00B050", "#92D050", "#FFFF00", "#FFC000", "#FF0000", "#C00000"];
     let defaultCats = [{ id: 1, emoji: '💊', name: 'صيدلية' }, { id: 2, emoji: '💻', name: 'شغل' }, { id: 3, emoji: '🏠', name: 'شخصي' }];
@@ -312,32 +406,22 @@
     let cur = null, rec = null, chunks = [], timerInt = null, sec = 0, stream = null, cameraStream = null;
     const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d');
     let drawing = false, lx = 0, ly = 0, selectedHex = '#ffffff';
-    function save() { localStorage.setItem('tasks_v6', JSON.stringify(tasks)); localStorage.setItem('cats_v5', JSON.stringify(cats)); localStorage.setItem('colors_v5', JSON.stringify(colors)); render(); }
-    function renderExcelTheme() {
-      const c1 = document.getElementById('excelTheme'); if (c1) { c1.innerHTML = ''; themeColors.flat().forEach(hex => { const d = document.createElement('div'); d.className = 'excel-cell'; d.style.background = hex; d.onclick = () => selectColor(hex); c1.appendChild(d); }); }
-      const c2 = document.getElementById('excelStandard'); if (c2) { c2.innerHTML = ''; standardColors.forEach(hex => { const d = document.createElement('div'); d.className = 'excel-cell'; d.style.background = hex; d.onclick = () => selectColor(hex); c2.appendChild(d); }); }
-      const m1 = document.getElementById('modalColorsTheme'); if (m1) { m1.innerHTML = ''; themeColors.flat().forEach(hex => { const d = document.createElement('div'); d.className = 'excel-cell'; d.style.background = hex; d.style.height = '24px'; if (cur && cur.color === hex) d.style.outline = '2px solid #111'; d.onclick = () => selectModalColor(hex); m1.appendChild(d); }); }
-      const m2 = document.getElementById('modalColorsStandard'); if (m2) { m2.innerHTML = ''; standardColors.forEach(hex => { const d = document.createElement('div'); d.className = 'excel-cell'; d.style.background = hex; d.style.height = '24px'; if (cur && cur.color === hex) d.style.outline = '2px solid #111'; d.onclick = () => selectModalColor(hex); m2.appendChild(d); }); }
-    }
-    function renderManagerLists() {
-      document.getElementById('cat').innerHTML = cats.map(c => `<option value="${c.name}">${c.emoji} ${c.name}</option>`).join('');
-      document.getElementById('catList').innerHTML = cats.map(c => `<div style="display:flex;justify-content:space-between;align-items:center;background:#FAFAF9;padding:10px;border-radius:10px;"><div>${c.emoji} <b>${c.name}</b></div><button onclick="delCat(${c.id})" style="border:none;background:#FEE2E2;width:28px;height:28px;border-radius:6px;color:#ef4444;">✕</button></div>`).join('');
-      document.getElementById('colorList').innerHTML = colors.map(col => `<div style="display:flex;justify-content:space-between;align-items:center;background:#FAFAF9;padding:10px;border-radius:10px;"><div style="display:flex;gap:8px;align-items:center;"><div style="width:24px;height:24px;border-radius:4px;background:${col.hex};border:1px solid #ddd;"></div><div>${col.name}</div></div><button onclick="delColor(${col.id})" style="border:none;background:#FEE2E2;width:28px;height:28px;border-radius:6px;">✕</button></div>`).join('');
-      renderQuickColors(); renderExcelTheme();
-    }
-    function renderQuickColors() { const row = document.getElementById('quickColors'); const all = [...standardColors, ...themeColors[0]]; row.innerHTML = all.slice(0, 8).map(c => `<div onclick="selectColor('${c}')" class="color-dot ${selectedHex === c ? 'active' : ''}" style="background:${c};flex-shrink:0;"></div>`).join(''); }
-    function selectColor(hex) { selectedHex = hex; renderQuickColors(); }
-    function selectModalColor(hex) { cur.color = hex; document.getElementById('modalCover').style.background = hex === 'transparent' ? '#fff' : hex; document.getElementById('currentColorPreview').style.background = hex === 'transparent' ? '#fff' : hex; renderExcelTheme(); save(); }
-    function toggleAllColors() { const box = document.getElementById('allColorsBox'); box.style.display = box.style.display === 'none' ? 'block' : 'none'; }
-    function openManager() { document.getElementById('managerModal').style.display = 'flex'; mTab('colors'); }
-    function closeManager() { document.getElementById('managerModal').style.display = 'none'; }
-    function mTab(t) { document.getElementById('mCats').style.display = t === 'cats' ? 'block' : 'none'; document.getElementById('mColors').style.display = t === 'colors' ? 'block' : 'none'; }
-    function addCategory() { const n = document.getElementById('newCatName').value.trim(), e = document.getElementById('newCatEmoji').value.trim() || '📌'; if (!n) return; cats.push({ id: Date.now(), emoji: e, name: n }); document.getElementById('newCatName').value = ''; renderManagerLists(); save(); }
-    function delCat(id) { cats = cats.filter(c => c.id !== id); renderManagerLists(); save(); }
-    function addQuick() { document.getElementById('mainInput').focus(); }
-    function doAdd() { const inp = document.getElementById('mainInput'); if (!inp.value.trim()) return; tasks.unshift({ id: Date.now(), text: inp.value.trim(), cat: document.getElementById('cat').value, color: selectedHex, done: false, drawings: [], photos: [], voices: [], note: '', subtasks: [], reminder: null }); inp.value = ''; save(); }
-    document.getElementById('mainInput').addEventListener('keydown', e => { if (e.key === 'Enter') doAdd(); });
-    document.getElementById('subInput').addEventListener('keydown', e => { if (e.key === 'Enter') addSub(); });
+    function save() { localStorage.setItem('tasks_v6', JSON.stringify(tasks)); localStorage.setItem('cats_v5', JSON.stringify(cats)); localStorage.setItem('colors_v5', JSON.stringify(colors)); render() }
+    function renderExcelTheme() { const c1 = document.getElementById('excelTheme'); if (c1) { c1.innerHTML = ''; themeColors.flat().forEach(hex => { const d = document.createElement('div'); d.className = 'excel-cell'; d.style.background = hex; d.onclick = () => selectColor(hex); c1.appendChild(d); }); } const c2 = document.getElementById('excelStandard'); if (c2) { c2.innerHTML = ''; standardColors.forEach(hex => { const d = document.createElement('div'); d.className = 'excel-cell'; d.style.background = hex; d.onclick = () => selectColor(hex); c2.appendChild(d); }); } const m1 = document.getElementById('modalColorsTheme'); if (m1) { m1.innerHTML = ''; themeColors.flat().forEach(hex => { const d = document.createElement('div'); d.className = 'excel-cell'; d.style.background = hex; d.style.height = '24px'; if (cur && cur.color === hex) d.style.outline = '2px solid #111'; d.onclick = () => selectModalColor(hex); m1.appendChild(d); }); } const m2 = document.getElementById('modalColorsStandard'); if (m2) { m2.innerHTML = ''; standardColors.forEach(hex => { const d = document.createElement('div'); d.className = 'excel-cell'; d.style.background = hex; d.style.height = '24px'; if (cur && cur.color === hex) d.style.outline = '2px solid #111'; d.onclick = () => selectModalColor(hex); m2.appendChild(d); }); } }
+    function renderManagerLists() { document.getElementById('cat').innerHTML = cats.map(c => `<option value="${c.name}">${c.emoji} ${c.name}</option>`).join(''); document.getElementById('catList').innerHTML = cats.map(c => `<div style="display:flex;justify-content:space-between;align-items:center;background:#FAFAF9;padding:10px;border-radius:10px;"><div>${c.emoji} <b>${c.name}</b></div><button onclick="delCat(${c.id})" style="border:none;background:#FEE2E2;width:28px;height:28px;border-radius:6px;color:#ef4444;">✕</button></div>`).join(''); document.getElementById('colorList').innerHTML = colors.map(col => `<div style="display:flex;justify-content:space-between;align-items:center;background:#FAFAF9;padding:10px;border-radius:10px;"><div style="display:flex;gap:8px;align-items:center;"><div style="width:24px;height:24px;border-radius:4px;background:${col.hex};border:1px solid #ddd;"></div><div>${col.name}</div></div><button onclick="delColor(${col.id})" style="border:none;background:#FEE2E2;width:28px;height:28px;border-radius:6px;">✕</button></div>`).join(''); renderQuickColors(); renderExcelTheme() }
+    function renderQuickColors() { const row = document.getElementById('quickColors'); const all = [...standardColors, ...themeColors[0]]; row.innerHTML = all.slice(0, 8).map(c => `<div onclick="selectColor('${c}')" class="color-dot ${selectedHex === c ? 'active' : ''}" style="background:${c};flex-shrink:0;"></div>`).join('') }
+    function selectColor(hex) { selectedHex = hex; renderQuickColors() }
+    function selectModalColor(hex) { cur.color = hex; document.getElementById('modalCover').style.background = hex === 'transparent' ? '#fff' : hex; document.getElementById('currentColorPreview').style.background = hex === 'transparent' ? '#fff' : hex; renderExcelTheme(); save() }
+    function toggleAllColors() { const box = document.getElementById('allColorsBox'); box.style.display = box.style.display === 'none' ? 'block' : 'none' }
+    function openManager() { document.getElementById('managerModal').style.display = 'flex'; mTab('colors') }
+    function closeManager() { document.getElementById('managerModal').style.display = 'none' }
+    function mTab(t) { document.getElementById('mCats').style.display = t === 'cats' ? 'block' : 'none'; document.getElementById('mColors').style.display = t === 'colors' ? 'block' : 'none' }
+    function addCategory() { const n = document.getElementById('newCatName').value.trim(), e = document.getElementById('newCatEmoji').value.trim() || '📌'; if (!n) return; cats.push({ id: Date.now(), emoji: e, name: n }); document.getElementById('newCatName').value = ''; renderManagerLists(); save() }
+    function delCat(id) { cats = cats.filter(c => c.id !== id); renderManagerLists(); save() }
+    function addQuick() { document.getElementById('mainInput').focus() }
+    function doAdd() { const inp = document.getElementById('mainInput'); if (inp.value.trim().toLowerCase() === 'خفي' || inp.value.trim().toLowerCase() === 'khfy') { inp.value = ''; revealHiddenTab(); return } if (!inp.value.trim()) return; tasks.unshift({ id: Date.now(), text: inp.value.trim(), cat: document.getElementById('cat').value, color: selectedHex, done: false, drawings: [], photos: [], voices: [], note: '', subtasks: [], reminder: null }); inp.value = ''; save() }
+    document.getElementById('mainInput').addEventListener('keydown', e => { if (e.key === 'Enter') doAdd() });
+    document.getElementById('subInput').addEventListener('keydown', e => { if (e.key === 'Enter') addSub() });
     function render() {
       renderManagerLists();
       document.getElementById('stats').innerText = `${fmt(tasks.length)} مهمة`;
@@ -346,7 +430,7 @@
         const catObj = cats.find(c => c.name === t.cat) || { emoji: '📌' }; const total = t.subtasks?.length || 0, done = t.subtasks?.filter(s => s.done).length || 0; const hasRem = t.reminder && t.reminder.enabled;
         return `<div onclick="openCard(${t.id})" style="background:${t.color === 'transparent' ? '#fff' : t.color};border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:14px;">
       <div style="display:flex;justify-content:space-between;"><div style="font-size:14px;font-weight:600;">${formatTextNumbers(t.text)}</div><div style="width:10px;height:10px;border-radius:50%;background:${t.done ? '#22c55e' : '#111'};"></div></div>
-      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;"><span style="font-size:11px;background:#fff;padding:4px 8px;border-radius:20px;">${catObj.emoji} ${t.cat}</span>${total ? `<span style="font-size:11px;background:#fff;padding:4px 8px;border-radius:20px;">✔️ ${fmt(done)}/${fmt(total)}</span>` : ''}${hasRem ? `<span style="font-size:11px;background:#FEF3C7;padding:4px 8px;border-radius:20px;">⏰</span>` : ''}${t.photos && t.photos.length ? `<span style="font-size:11px;background:#fff;padding:4px 8px;border-radius:20px;">📷 ${t.photos.length}</span>` : ''}</div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;"><span style="font-size:11px;background:#fff;padding:4px 8px;border-radius:20px;">${catObj.emoji} ${t.cat}</span>${total ? `<span style="font-size:11px;background:#fff;padding:4px 8px;border-radius:20px;">✔ ${fmt(done)}/${fmt(total)}</span>` : ''}${hasRem ? `<span style="font-size:11px;background:#FEF3C7;padding:4px 8px;border-radius:20px;">⏰</span>` : ''}${t.photos && t.photos.length ? `<span style="font-size:11px;background:#fff;padding:4px 8px;border-radius:20px;">📷 ${t.photos.length}</span>` : ''}</div>
     </div>`;
       }).join('');
     }
@@ -373,11 +457,11 @@
     }
     function closeModal() { document.getElementById('modal').style.display = 'none'; closeCamera(); if (cur) { cur.text = document.getElementById('modalTitle').innerText.trim() || cur.text; cur.note = document.getElementById('note').value; save(); } }
     function tab(t) {
-      ['Colors', 'Camera', 'Draw', 'Voice', 'Note', 'Rem'].forEach(k => {
-        const p = document.getElementById('p' + k);
-        const b = document.getElementById('t' + k);
+      ['Colors', 'Camera', 'Draw', 'Voice', 'Note', 'Rem', 'Hidden'].forEach(k => {
+        const p = document.getElementById('p' + k); const b = document.getElementById('t' + k);
         if (p) p.style.display = k.toLowerCase() === t.toLowerCase() ? 'block' : 'none';
-        if (b) b.classList.toggle('active', k.toLowerCase() === t.toLowerCase());
+        if (b && k !== 'Hidden') b.classList.toggle('active', k.toLowerCase() === t.toLowerCase());
+        if (k === 'Hidden' && b) b.classList.toggle('active', t.toLowerCase() === 'hidden');
       });
     }
     function refreshSubtasks() { const total = cur.subtasks.length, done = cur.subtasks.filter(s => s.done).length, perc = total ? Math.round(done / total * 100) : 0; document.getElementById('subProgress').innerText = `${fmt(done)}/${fmt(total)}`; document.getElementById('subBar').style.width = perc + '%'; document.getElementById('subList').innerHTML = cur.subtasks.map(s => `<div style="display:flex;gap:8px;align-items:center;background:#FAFAF9;padding:8px 10px;border-radius:10px;"><input type="checkbox" ${s.done ? 'checked' : ''} onchange="toggleSub(${s.id})"><div contenteditable="true" onblur="editSub(${s.id},this.innerText)" style="flex:1;font-size:13px;">${formatTextNumbers(s.text)}</div><button onclick="delSub(${s.id})" style="border:none;background:#fff;width:26px;height:26px;border-radius:6px;color:#ef4444;">✕</button></div>`).join('') || `<div style="text-align:center;color:#aaa;font-size:12px;padding:8px;">مفيش مهام</div>`; }
@@ -391,8 +475,68 @@
     canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; const p = pos(e); lx = p.x; ly = p.y; }, { passive: false }); canvas.addEventListener('touchmove', e => { e.preventDefault(); if (!drawing) return; const p = pos(e); ctx.strokeStyle = document.getElementById('penColor').value; ctx.lineWidth = document.getElementById('penSize').value; ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(p.x, p.y); ctx.stroke(); lx = p.x; ly = p.y; }, { passive: false }); canvas.addEventListener('touchend', () => drawing = false);
     function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); } function saveDraw() { const d = canvas.toDataURL(); cur.drawings.unshift(d); clearCanvas(); refreshDrawGallery(); save(); } function refreshDrawGallery() { document.getElementById('drawGallery').innerHTML = cur.drawings.map((d, i) => `<div style="position:relative;"><img src="${d}" style="width:70px;height:70px;object-fit:cover;border-radius:10px;border:1px solid #eee;"><button onclick="delDraw(${i})" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#ef4444;color:#fff;border:none;">✕</button></div>`).join(''); } function delDraw(i) { cur.drawings.splice(i, 1); refreshDrawGallery(); save(); }
     async function toggleRec() { const btn = document.getElementById('recBtn'); if (!rec || rec.state === 'inactive') { try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); rec = new MediaRecorder(stream); chunks = []; rec.ondataavailable = e => chunks.push(e.data); rec.onstop = () => { const blob = new Blob(chunks, { type: 'audio/webm' }); const r = new FileReader(); r.onloadend = () => { cur.voices.unshift(r.result); refreshVoiceList(); save(); }; r.readAsDataURL(blob); }; rec.start(); btn.style.background = '#111'; btn.innerHTML = '■'; sec = 0; timerInt = setInterval(() => { sec++; document.getElementById('timer').innerText = String(Math.floor(sec / 60)).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0'); }, 1000); } catch { alert('فعل الميكروفون'); } } else { rec.stop(); stream.getTracks().forEach(t => t.stop()); clearInterval(timerInt); btn.style.background = '#ef4444'; btn.innerHTML = '●'; document.getElementById('timer').innerText = '00:00'; } }
-    function refreshVoiceList() { document.getElementById('voiceList').innerHTML = cur.voices.map((v, i) => `<div style="display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #F2EFEA;padding:10px;border-radius:12px;"><audio src="${v}" controls style="flex:1;height:36px;"></audio><button onclick="delVoice(${i})" style="background:#FEE2E2;border:none;width:36px;height:36px;border-radius:10px;color:#ef4444;">✕</button></div>`).join(''); } function delVoice(i) { cur.voices.splice(i, 1); refreshVoiceList(); save(); } function saveNote() { cur.note = document.getElementById('note').value; document.getElementById('notePreview').innerText = formatTextNumbers(cur.note); save(); } function toggleDone() { cur.done = !cur.done; save(); document.getElementById('doneBtn').innerText = cur.done ? 'إعادة فتح' : 'تم ✓'; } function deleteCurrent() { if (confirm('تحذف الكارت؟')) { tasks = tasks.filter(x => x.id !== cur.id); closeModal(); save(); } }
+    function refreshVoiceList() { document.getElementById('voiceList').innerHTML = cur.voices.map((v, i) => `<div style="display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #F2EFEA;padding:10px;border-radius:12px;"><audio src="${v}" controls style="flex:1;height:36px;"></audio><button onclick="delVoice(${i})" style="background:#FEE2E2;border:none;width:36px;height:36px;border-radius:10px;color:#ef4444;">✕</button></div>`).join(''); } function delVoice(i) { cur.voices.splice(i, 1); refreshVoiceList(); save(); } function saveNote() { cur.note = document.getElementById('note').value; document.getElementById('notePreview').innerText = formatTextNumbers(cur.note); save(); } function toggleDone() { cur.done = !cur.done; save(); document.getElementById('doneBtn').innerText = cur.done ? 'إعادة فتح' : 'تم ✓'; }
+
+    /* ===== نظام التحذير عند الحذف ===== */
+    function deleteCurrent() {
+      if (!cur) return;
+      const preview = document.getElementById('delTaskPreview');
+      preview.innerHTML = `<div style="font-weight:800;font-size:13px">${formatTextNumbers(cur.text)}</div><div style="font-size:11px;color:#777;margin-top:4px">${cur.cat} • ${new Date(cur.id).toLocaleDateString('ar-EG')}</div>`;
+      const details = [];
+      if (cur.subtasks?.length) details.push(`✔ ${cur.subtasks.length} مهام فرعية (${cur.subtasks.filter(s => s.done).length} مكتملة)`);
+      if (cur.photos?.length) details.push(`📷 ${cur.photos.length} صور`);
+      if (cur.drawings?.length) details.push(`✏️ ${cur.drawings.length} رسومات`);
+      if (cur.voices?.length) details.push(`🎙 ${cur.voices.length} تسجيلات صوتية`);
+      if (cur.note) details.push(`📝 يوجد ملاحظات`);
+      if (cur.reminder?.enabled) details.push(`⏰ يوجد منبه نشط`);
+      if (details.length === 0) details.push('مهمة بسيطة بدون مرفقات');
+      document.getElementById('delDetails').innerHTML = details.map(d => `• ${d}`).join('<br>');
+      document.getElementById('delConfirmCheck').checked = false;
+      toggleDelBtn();
+      document.getElementById('deleteWarningModal').classList.add('show');
+    }
+    function closeDeleteWarning() { document.getElementById('deleteWarningModal').classList.remove('show') }
+    function toggleDelBtn() {
+      const checked = document.getElementById('delConfirmCheck').checked;
+      const btn = document.getElementById('finalDelBtn');
+      btn.disabled = !checked;
+      if (checked) { btn.style.background = '#ef4444'; btn.style.color = '#fff'; btn.style.cursor = 'pointer'; }
+      else { btn.style.background = '#E5E7EB'; btn.style.color = '#9CA3AF'; btn.style.cursor = 'not-allowed'; }
+    }
+    function confirmDelete() {
+      if (!cur) return;
+      tasks = tasks.filter(x => x.id !== cur.id);
+      closeDeleteWarning();
+      closeModal();
+      save();
+    }
+
     render();
+
+    /* ===== تبويب الخفي ===== */
+    let hKey = null, hNotes = [], hTimer = null;
+    const H_CFG = '__sys_pref_cache__', H_DATA = '__sys_pref_data__';
+    async function deriveKey(p, s) { const e = new TextEncoder(); const km = await crypto.subtle.importKey('raw', e.encode(p), { name: 'PBKDF2' }, false, ['deriveKey']); return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: s, iterations: 120000, hash: 'SHA-256' }, km, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']) }
+    async function hEnc(d, k) { const iv = crypto.getRandomValues(new Uint8Array(12)); const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, k, new TextEncoder().encode(JSON.stringify(d))); return { iv: Array.from(iv), ct: Array.from(new Uint8Array(ct)) } }
+    async function hDec(o, k) { try { const dec = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: new Uint8Array(o.iv) }, k, new Uint8Array(o.ct)); return JSON.parse(new TextDecoder().decode(dec)) } catch { return null } }
+    function revealHiddenTab() { const btn = document.getElementById('tHidden'); btn.style.display = 'block'; btn.animate([{ transform: 'scale(0)' }, { transform: 'scale(1.15)' }, { transform: 'scale(1)' }], { duration: 300 }); if (document.getElementById('modal').style.display === 'none') { if (tasks[0]) openCard(tasks[0].id); else { tasks.unshift({ id: Date.now(), text: 'مساحة العمل', cat: cats[0].name, color: '#fff', done: false, drawings: [], photos: [], voices: [], note: '', subtasks: [], reminder: null }); save(); openCard(tasks[0].id) } } setTimeout(() => tab('hidden'), 350); }
+    function hideHiddenTab() { document.getElementById('tHidden').style.display = 'none'; tab('colors'); }
+    function lockHidden() { hKey = null; hNotes = []; document.getElementById('hiddenAuth').style.display = 'block'; document.getElementById('hiddenContent').style.display = 'none'; document.getElementById('hPass').value = ''; }
+    async function unlockHidden() {
+      const pass = document.getElementById('hPass').value.trim(); if (pass.length < 4) { document.getElementById('hErr').style.display = 'block'; document.getElementById('hErr').innerText = 'الرمز قصير'; return }
+      const cfg = JSON.parse(localStorage.getItem(H_CFG) || 'null');
+      try {
+        if (!cfg) { const salt = crypto.getRandomValues(new Uint8Array(16)); const key = await deriveKey(pass, salt); const enc = await hEnc([], key); localStorage.setItem(H_CFG, JSON.stringify({ salt: Array.from(salt) })); localStorage.setItem(H_DATA, JSON.stringify(enc)); hKey = key; hNotes = []; }
+        else { const key = await deriveKey(pass, new Uint8Array(cfg.salt)); const dataObj = JSON.parse(localStorage.getItem(H_DATA) || 'null'); let dec = null; if (dataObj) dec = await hDec(dataObj, key); if (dataObj && dec === null) throw new Error('wrong'); hKey = key; hNotes = dec || []; }
+        document.getElementById('hiddenAuth').style.display = 'none'; document.getElementById('hiddenContent').style.display = 'block'; renderHidden(); if (hTimer) clearTimeout(hTimer); hTimer = setTimeout(lockHidden, 60000);
+      } catch { const e = document.getElementById('hErr'); e.style.display = 'block'; e.innerText = 'رمز خاطئ!'; }
+    }
+    async function saveHidden() { if (!hKey) return; const enc = await hEnc(hNotes, hKey); localStorage.setItem(H_DATA, JSON.stringify(enc)) }
+    function renderHidden() { const q = (document.getElementById('hSearch').value || '').toLowerCase(); const list = document.getElementById('hList'); const f = hNotes.filter(n => !q || n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q)).sort((a, b) => b.id - a.id); document.getElementById('hCount').innerText = `${f.length} نوتس سرية • مشفرة`; if (!f.length) { list.innerHTML = `<div style="text-align:center;padding:20px;color:#555;font-size:12px">مفيش نوتس سرية لسه</div>`; return } list.innerHTML = f.map(n => `<div class="hidden-note"><div style="display:flex;justify-content:space-between"><b style="font-size:13px">${n.title.replace(/</g, '&lt;')}</b><div style="display:flex;gap:6px"><button onclick="editHidden(${n.id})" style="background:#222;border:none;color:#fff;width:24px;height:24px;border-radius:6px">✏️</button><button onclick="delHidden(${n.id})" style="background:#3a1515;border:none;color:#ff6b6b;width:24px;height:24px;border-radius:6px">✕</button></div></div><div style="font-size:12px;color:#ccc;margin-top:6px;white-space:pre-wrap">${n.body.replace(/</g, '&lt;')}</div><div style="font-size:9px;color:#555;margin-top:6px">${new Date(n.id).toLocaleString('ar-EG')}</div></div>`).join(''); }
+    function addHiddenNote() { const t = prompt('عنوان النوت الخفي:'); if (t === null) return; const b = prompt('المحتوى:'); if (b === null) return; if (!t.trim() && !b.trim()) return; hNotes.unshift({ id: Date.now(), title: t.trim() || 'بدون عنوان', body: b.trim() }); saveHidden(); renderHidden() }
+    function editHidden(id) { const n = hNotes.find(x => x.id === id); if (!n) return; const nt = prompt('عدل العنوان:', n.title); if (nt === null) return; const nb = prompt('عدل المحتوى:', n.body); if (nb === null) return; n.title = nt.trim(); n.body = nb.trim(); saveHidden(); renderHidden() }
+    function delHidden(id) { if (!confirm('تحذف؟')) return; hNotes = hNotes.filter(x => x.id !== id); saveHidden(); renderHidden() }
+    (function () { const trig = document.getElementById('vaultTrigger'); let tm = null; function sp(e) { e.preventDefault(); tm = setTimeout(revealHiddenTab, 1200) } function cp() { clearTimeout(tm) } trig.addEventListener('touchstart', sp, { passive: false }); trig.addEventListener('touchend', cp); trig.addEventListener('mousedown', sp); trig.addEventListener('mouseup', cp); trig.addEventListener('mouseleave', cp); document.getElementById('hPass').addEventListener('keydown', e => { if (e.key === 'Enter') unlockHidden() }); })();
   </script>
 </body>
 
