@@ -15,6 +15,24 @@
 #cameraVideoAdd{width:100%;border-radius:10px;background:#000;aspect-ratio:4/3;object-fit:cover}
 .table-wrap{background:#fff;margin:10px;border-radius:16px;border:1px solid #f0f0f0;overflow:auto;width:calc(100% - 20px)}.table-head{padding:10px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f5f5f5}.table-head b{font-size:11px;font-weight:700}table{border-collapse:collapse;width:max-content;min-width:100%}th{font-size:7px;color:#9aa0aa;background:#fafafa;padding:8px 4px;position:sticky;top:0;min-width:44px;text-align:center}td{font-size:9px;height:36px;border-bottom:1px solid #f6f6f6;text-align:center;min-width:44px;cursor:pointer}th:first-child,td:first-child{position:sticky;right:0;min-width:110px;background:#fff;text-align:right;padding-right:12px;font-size:10px;font-weight:700;z-index:2;border-left:1px solid #f0f0f0}td.has-val{background:#fffdf0;font-weight:700}.icon-btn{width:24px;height:24px;border-radius:7px;border:1px solid #f0f0f0;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;margin-left:3px}.icon-btn.del{color:#ef4444;background:#fff5f5;border-color:#ffe1e1}.icon-btn.edit{color:#111;background:#f7f7f8}.input-modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:200;padding:16px}.input-modal.active{display:flex}.input-box{background:#fff;border-radius:14px;padding:14px;width:100%;max-width:320px}.input-box input{width:100%;padding:10px;border-radius:8px;border:1px solid #ececef;margin:8px 0;background:#f7f7f8;font-size:10px}.btn-mini{border:none;padding:6px 10px;border-radius:999px;font-size:8px;font-weight:700;cursor:pointer}.btn-mini.black{background:#111;color:#fff}.hidden{display:none!important}.chips{display:flex;gap:6px;overflow:auto;padding:6px 0}.chip{flex-shrink:0;padding:6px 12px;border-radius:999px;border:1px solid #ececef;background:#f7f7f8;font-size:8px;font-weight:600;white-space:nowrap;cursor:pointer}.chip.active{background:#111!important;color:#fff!important;border-color:#111!important}.toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(100px);background:#111;color:#fff;padding:9px 14px;border-radius:10px;font-size:9px;font-weight:700;z-index:200;transition:.3s;opacity:0}.toast.show{transform:translateX(-50%) translateY(0);opacity:1}.cell-modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:end;justify-content:center;z-index:120}.cell-modal.active{display:flex}.cell-box{width:100%;background:#fff;border-radius:18px 18px 0 0;max-height:92dvh;overflow:auto}.cell-head{padding:12px 14px;display:flex;justify-content:space-between;border-bottom:1px solid #f5f5f5;position:sticky;top:0;background:#fff}.cell-body{padding:12px 14px}.cell-item{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f6f6f6;font-size:9px}
 </style></head><body>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbw-fO9Xzi2jQhEm5Yy-wgVr4gNLW2wFu6uNquTcDN6ZsFdYOiMjv9E_QKwzyM5DXySDiQ/exec";
+async function syncToSheet(row) {
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify({action:'add', sheet:'daily', row: row})
+    });
+    console.log('synced to sheet', row);
+  } catch(e) {
+    console.error('sheet sync error', e);
+  }
+}
+</script>
+
 <div class="tabs">
   <button class="tab active" id="tab-income" onclick="showMain('income')">دخل</button>
   <button class="tab" id="tab-expense" onclick="showMain('expense')">مصروف</button>
@@ -240,4 +258,43 @@ function renderAll(){renderIncome();renderExpense();renderDebt();renderAmanat();
 function editDebt(id,oldName){openInputModal(`تعديل ${oldName}`,oldName,(newName)=>{let d=debts.find(x=>x.id===id);if(d){d.person=newName;localStorage.setItem('debts_pro_v2',JSON.stringify(debts));renderAll();}});}
 function deleteAmanatPerson(person){openInputModal(`مسح ${person} - اكتب: مسح ${person}`,'',(v)=>{if(v!==`مسح ${person}`) return;amanatTrans=amanatTrans.filter(a=>a.person!==person);db.amanatPersons=db.amanatPersons.filter(p=>p!==person);localStorage.setItem('amanat_trans',JSON.stringify(amanatTrans));localStorage.setItem('master_final',JSON.stringify(db));renderAll();});}
 document.addEventListener('DOMContentLoaded',()=>{renderAll();});
-</script></body></html>
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', ()=>{
+  const observer = new MutationObserver(()=>{
+    const btn = document.querySelector('.save-btn');
+    if(btn && !btn.dataset.synced){
+      btn.dataset.synced='1';
+      btn.addEventListener('click', ()=>{
+        // collect data from modal inputs
+        const modal = document.querySelector('.modal-box');
+        if(!modal) return;
+        const inputs = modal.querySelectorAll('input, select, textarea');
+        let row = {};
+        inputs.forEach(inp=>{
+          if(inp.placeholder || inp.value){
+            row[inp.previousElementSibling?.innerText || inp.name || 'field'] = inp.value;
+          }
+        });
+        // Try to get specific fields
+        const amountEl = document.querySelector('input[type="number"], input[placeholder*="قيمة"]');
+        const catEl = document.querySelector('select');
+        row = {
+          'المعرف': Date.now(),
+          'التاريخ': new Date().toISOString().split('T')[0],
+          'النوع': document.querySelector('.tab.active')?.innerText || 'دخل',
+          'البند': catEl?.value || '',
+          'المبلغ': amountEl?.value || 0,
+          'المحفظة': 'كاش',
+          'ملاحظات': '',
+          'وقت الإنشاء': new Date().toISOString()
+        };
+        syncToSheet(row);
+      });
+    }
+  });
+  observer.observe(document.body, {childList:true, subtree:true});
+});
+</script>
+
+</body></html>
