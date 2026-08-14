@@ -1,47 +1,148 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<style>
-*{box-sizing:border-box;font-family:'IBM Plex Sans Arabic',sans-serif}
-body{margin:0;background:#e5e7eb;display:flex;justify-content:center;min-height:100vh;padding:12px}
-.phone{width:390px;max-width:100%;background:#fff;border:8px solid #111;border-radius:28px;overflow:hidden;position:relative;min-height:85vh;display:flex;flex-direction:column}
-.pageWrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.page{flex:1;width:100%;border:none;display:none}
-.page.active{display:block}
-.bottom-nav{display:flex;justify-content:space-around;padding:8px 0;background:#fff;border-top:1px solid #f0f0f0}
-.nav-item{flex:1;text-align:center;font-size:8px;color:#9aa0aa;cursor:pointer}
-.nav-item.active{color:#111;font-weight:700}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'IBM Plex Sans Arabic', sans-serif
+    }
+
+    body {
+      background: #e5e5e5;
+      height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center
+    }
+
+    .pageWrap {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      height: 100dvh;
+      max-height: 900px;
+      background: #FBF9F6;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .15)
+    }
+
+    .page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(10px);
+      transition: opacity .18s ease, transform .18s ease
+    }
+
+    .page.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+      z-index: 2
+    }
+
+    .nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 68px;
+      background: #fff;
+      border-top: 1px solid #F2EFEA;
+      display: flex;
+      align-items: center;
+      z-index: 100
+    }
+
+    .nav button {
+      flex: 1;
+      border: none;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 6px 2px;
+      border-radius: 14px;
+      color: #9aa0aa;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer
+    }
+
+    .nav button span:first-child {
+      font-size: 20px
+    }
+
+    .nav button.active {
+      color: #111;
+      background: #F5F5F4
+    }
+
+    /* على الكمبيوتر يظهر كأنه موبايل في النص بنفس مقاس الفون */
+    @media (min-width: 768px) {
+      .pageWrap {
+        border-radius: 30px;
+        border: 10px solid #111;
+        height: 85vh
+      }
+
+      .nav {
+        border-radius: 0 0 20px 20px
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div class="phone">
+
   <div class="pageWrap">
     <iframe data-page="home.html" src="home.html" class="page active"></iframe>
-    <iframe data-page="daily.html" src="about:blank" data-src="daily.html" class="page"></iframe>
-    <iframe data-page="attendance.html" src="about:blank" data-src="attendance.html" class="page"></iframe>
-    <iframe data-page="tasks.html" src="about:blank" data-src="tasks.html" class="page"></iframe>
+    <iframe data-page="daily.html" src="about:blank" class="page"></iframe>
+    <iframe data-page="attendance.html" src="about:blank" class="page"></iframe>
+    <iframe data-page="tasks.html" src="about:blank" class="page"></iframe>
+    <nav class="nav">
+      <button class="active" onclick="switchPage('home.html',this)"><span>🏠</span><span>الرئيسية</span></button>
+      <button onclick="switchPage('daily.html',this)"><span>📅</span><span>اليومية</span></button>
+      <button onclick="switchPage('attendance.html',this)"><span>⏱️</span><span>الحضور</span></button>
+      <button onclick="switchPage('tasks.html',this)"><span>📝</span><span>المهام</span></button>
+    </nav>
   </div>
-  <div class="bottom-nav">
-    <div class="nav-item active" onclick="showPage('home.html')">🏠<br>الرئيسية</div>
-    <div class="nav-item" onclick="showPage('daily.html')">📅<br>اليومية</div>
-    <div class="nav-item" onclick="showPage('attendance.html')">⏱️<br>الحضور</div>
-    <div class="nav-item" onclick="showPage('tasks.html')">📝<br>المهام</div>
-  </div>
-</div>
-<script>
-function showPage(name){
-  document.querySelectorAll('.page').forEach(p=>{
-    if(p.dataset.page===name){
-      if(p.src==='about:blank' && p.dataset.src) p.src=p.dataset.src;
-      p.classList.add('active');
-    }else p.classList.remove('active');
-  });
-  document.querySelectorAll('.nav-item').forEach((n,i)=>{
-    n.classList.toggle('active', n.textContent.includes(name==='home.html'?'الرئيسية':name==='daily.html'?'اليومية':name==='attendance.html'?'الحضور':'المهام'));
-  });
-}
-</script>
+
+  <script>
+    const frames = document.querySelectorAll('.page');
+    function switchPage(name, btn) {
+      frames.forEach(f => {
+        const isTarget = f.dataset.page === name;
+        f.classList.toggle('active', isTarget);
+        if (isTarget && f.src.includes('about:blank')) {
+          f.src = name;
+        }
+      });
+      document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+    // يحمل باقي الصفحات في الخلفية عشان الفتح يبقى فوري وسريع زي الفيجوال
+    window.addEventListener('load', () => {
+      setTimeout(() => { document.querySelector('[data-page="daily.html"]').src = 'daily.html'; }, 800);
+      setTimeout(() => { document.querySelector('[data-page="attendance.html"]').src = 'attendance.html'; }, 1600);
+      setTimeout(() => { document.querySelector('[data-page="tasks.html"]').src = 'tasks.html'; }, 2400);
+    });
+  </script>
 </body>
+
 </html>
