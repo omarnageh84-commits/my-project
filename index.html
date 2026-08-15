@@ -1,334 +1,71 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700;800&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:'IBM Plex Sans Arabic',sans-serif}
-body{background:#FBF9F6;padding:10px 10px 95px;color:#111}
-.en{font-family:'JetBrains Mono',monospace!important;direction:ltr!important}
-.card{background:#fff;border:1px solid #F2EFEA;border-radius:20px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.04);cursor:pointer;transition:.15s}
-.card:active{transform:scale(.97)}
-.hero{background:linear-gradient(145deg,#111 0%,#2a2a2a 100%);color:#fff;border-radius:20px;padding:15px;position:relative;overflow:hidden}
-.qbtn{background:#fff;border:1px solid #F2EFEA;border-radius:18px;padding:12px 6px;text-align:center;font-weight:800;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:5px;min-height:72px;justify-content:center;cursor:pointer}
-.qbtn:active{transform:scale(.92)}
-.tab{padding:7px 13px;border-radius:999px;font-size:10px;font-weight:800;cursor:pointer;border:1px solid #F2EFEA;background:#fff}
-.tab.active{background:#111;color:#fff;border-color:#111}
-.search{width:100%;background:#fff;border:1.5px solid #F2EFEA;border-radius:14px;padding:11px 14px;font-size:11px;outline:none}
-.search:focus{border-color:#111}
-.bar{height:6px;border-radius:999px;background:#F5F5F4;overflow:hidden}
-.bar-fill{height:100%;border-radius:999px;transition:1.2s}
-.score-ring{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px}
-</style>
-</head>
-<body>
-
-<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 2px 12px">
-<div><h2 style="font-size:19px;font-weight:800">أهلاً يا عمر 👋</h2><p style="font-size:10px;color:#9aa0aa;margin-top:4px"><span id="today"></span> • <span id="liveClock" class="en" style="font-weight:800;color:#111">--:--</span></p></div>
-<div style="display:flex;gap:8px;align-items:center">
-<div id="healthBox" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #F2EFEA;border-radius:14px;padding:5px 8px"><div id="scoreRing" class="score-ring en" style="background:#DCFCE7;color:#166534">--</div><div><div style="font-size:8px;color:#9aa0aa;font-weight:700">صحة المشروع</div><div id="healthLabel" style="font-size:10px;font-weight:800">جيد</div></div></div>
-<div style="width:36px;height:36px;background:#111;color:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800">ع</div>
-</div>
-</div>
-
-<input id="globalSearch" class="search" placeholder="🔍 ابحث في كل شيء... فئة، محفظة، دين، ملاحظة" oninput="onSearch(this.value)">
-
-<!-- HERO + KPIs -->
-<div style="display:grid;grid-template-columns:1.15fr.85fr;gap:8px;margin:10px 0 8px">
-<div class="hero" onclick="goAtt()">
-<div style="display:flex;justify-content:space-between"><span style="font-size:8px;opacity:.6">🕒 حضور • اضغط للتفاصيل</span><span id="workHours" class="en" style="font-size:8px;background:rgba(255,255,255,.15);padding:4px 9px;border-radius:999px">0h</span></div>
-<h3 id="attStatus" style="font-size:16px;margin:10px 0 2px;font-weight:800">غير مسجل</h3><p id="attSub" style="font-size:9px;opacity:.6">سجل حضورك اليوم</p>
-<div style="display:flex;gap:8px;margin-top:14px"><button onclick="event.stopPropagation();checkIn()" style="flex:1;border:none;background:#22c55e;color:#fff;padding:11px;border-radius:12px;font-size:10px;font-weight:800">حضور</button><button onclick="event.stopPropagation();checkOut()" style="flex:1;border:none;background:#2a2a2a;color:#fff;padding:11px;border-radius:12px;font-size:10px;font-weight:800;border:1px solid #333">انصراف</button></div>
-</div>
-<div style="display:flex;flex-direction:column;gap:8px">
-<div class="card" onclick="goDaily('total')" style="background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border-color:#BBF7D0"><span style="font-size:9px;font-weight:800;color:#166534">📊 صافي اليوم</span><h3 id="todayTotal" class="en" style="font-size:17px;font-weight:800;color:#166534;margin:6px 0">0</h3><div style="display:flex;justify-content:space-between"><span id="todayCount" style="font-size:8px;color:#166534">0 حركة</span><b id="todayProfit" class="en" style="font-size:10px">0</b></div><div class="bar" style="margin-top:8px"><div id="todayBar" class="bar-fill" style="background:#16a34a;width:0%"></div></div></div>
-<div class="card" onclick="goPage('tasks.html',3)"><div style="display:flex;justify-content:space-between"><span style="font-size:9px;font-weight:700;color:#8b8f98">📝 مهام</span><span id="tasksDone" style="font-size:8px;background:#F5F5F4;padding:4px 8px;border-radius:999px">0/0</span></div><h3 id="tasksCount" style="font-size:19px;font-weight:800;margin:6px 0">0</h3><div class="bar"><div id="taskBar" class="bar-fill" style="background:#111;width:0%"></div></div></div>
-</div>
-</div>
-
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px">
-<div class="card" style="text-align:center"><small style="font-size:8px;font-weight:800;color:#8b8f98">💰 كاش حالي</small><b id="cashBalance" class="en" style="display:block;font-size:16px;margin-top:4px">0</b><span id="cashStatus" style="font-size:7px;padding:3px 8px;border-radius:999px;background:#DCFCE7;color:#166534;display:inline-block;margin-top:6px">نشط</span></div>
-<div class="card" onclick="goDaily('income')" style="text-align:center;background:#FFFBEB;border-color:#FDE68A"><small style="font-size:8px;font-weight:800;color:#92400E">📥 دخل الشهر</small><b id="monthIncome" class="en" style="display:block;font-size:16px;color:#166534;margin-top:4px">0</b><small id="monthIncomeCount" style="font-size:7px;color:#92400E">0 عملية</small></div>
-<div class="card" onclick="goDaily('expense')" style="text-align:center;background:#FEF2F2;border-color:#FECACA"><small style="font-size:8px;font-weight:800;color:#991B1B">📤 مصروف الشهر</small><b id="monthExpense" class="en" style="display:block;font-size:16px;color:#991B1B;margin-top:4px">0</b><small id="monthExpenseCount" style="font-size:7px;color:#991B1B">0 عملية</small></div>
-</div>
-
-<!-- مركز التقارير -->
-<div class="card" style="cursor:default;margin-bottom:12px">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><b style="font-size:12px">📈 مركز التقارير الاحترافي</b><div style="display:flex;gap:5px"><button onclick="exportCSV()" style="font-size:8px;border:1px solid #eee;background:#fff;padding:5px 10px;border-radius:999px">CSV</button><button onclick="exportJSON()" style="font-size:8px;border:1px solid #eee;background:#fff;padding:5px 10px;border-radius:999px">نسخ احتياطي</button></div></div>
-
-<div style="display:flex;gap:6px;overflow:auto;padding-bottom:8px;margin-bottom:10px">
-<div class="tab active" onclick="setRange('today',this)">اليوم</div>
-<div class="tab" onclick="setRange('week',this)">7 أيام</div>
-<div class="tab" onclick="setRange('month',this)">الشهر</div>
-<div class="tab" onclick="setRange('year',this)">السنة</div>
-<div class="tab" onclick="setRange('all',this)">الكل</div>
-</div>
-
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-<div style="background:#F0FDF4;border-radius:14px;padding:11px"><span style="font-size:8px;color:#166534;font-weight:700">إجمالي دخل الفترة</span><b id="repInc" class="en" style="display:block;font-size:15px;color:#16a34a;margin-top:2px">0</b><small id="repIncAvg" class="en" style="font-size:7px;color:#666">متوسط 0/يوم</small></div>
-<div style="background:#FEF2F2;border-radius:14px;padding:11px"><span style="font-size:8px;color:#991B1B;font-weight:700">إجمالي مصروف</span><b id="repExp" class="en" style="display:block;font-size:15px;color:#ef4444;margin-top:2px">0</b><small id="repExpAvg" class="en" style="font-size:7px;color:#666">حرق 0/يوم</small></div>
-<div style="background:#111;color:#fff;border-radius:14px;padding:11px"><span style="font-size:8px;opacity:.6">صافي الربح</span><b id="repNet" class="en" style="display:block;font-size:15px;margin-top:2px">0</b><small id="repMargin" class="en" style="font-size:7px;opacity:.7">هامش 0%</small></div>
-<div style="background:#FFFBEB;border-radius:14px;padding:11px"><span style="font-size:8px;color:#92400E;font-weight:700">توقع نهاية الشهر</span><b id="repForecast" class="en" style="display:block;font-size:12px;color:#92400E;margin-top:2px">0</b><small id="repBest" style="font-size:7px;color:#92400E">أفضل يوم -</small></div>
-</div>
-
-<canvas id="reportCanvas" height="140" style="width:100%;background:#FBF9F6;border-radius:14px;cursor:pointer" onclick="toggleChart()"></canvas>
-<div style="text-align:center;font-size:7px;color:#9aa0aa;margin-top:4px" id="chartHint">اضغط للتبديل: أعمدة ↔ تراكمي</div>
-
-<div id="catBreak" style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:7px"></div>
-<div id="walletBreak" style="margin-top:10px"></div>
-</div>
-
-<!-- إجراءات سريعة -->
-<div style="display:flex;justify-content:space-between;margin:0 2px 8px"><b style="font-size:11px">إجراءات سريعة • توصل لأي نقطة</b><span style="font-size:9px;color:#9aa0aa">دوس للانتقال</span></div>
-<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px">
-<button class="qbtn" onclick="goDaily('expense')">💸<span>مصروف</span><small id="q-expense" class="en">0</small></button>
-<button class="qbtn" onclick="goDaily('income')">💰<span>دخل</span><small id="q-income" class="en">0</small></button>
-<button class="qbtn" onclick="goDaily('debt')" style="background:#FFFBEB;border-color:#FDE68A">📒<span>ديون</span><small id="q-debt" class="en">0</small></button>
-<button class="qbtn" onclick="goDaily('total')">👛<span>المحافظ</span><small class="en" id="q-wallets">كاش</small></button>
-<button class="qbtn" onclick="goDaily('amanat')">🤝<span>أمانات</span><small id="q-amanat" class="en">0</small></button>
-<button class="qbtn" onclick="goAtt()">⏱️<span>الحضور</span><small id="q-att" class="en">0h</small></button>
-</div>
-
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-<div class="card" onclick="goDaily('income')" style="display:flex;justify-content:space-between;align-items:center"><div><span style="font-size:9px;font-weight:800;color:#166534">إجمالي الدخل</span><br><b id="sumIncome" class="en" style="color:#16a34a;font-size:15px">0</b></div><div style="width:38px;height:38px;background:#DCFCE7;border-radius:12px;display:flex;align-items:center;justify-content:center">💰</div></div>
-<div class="card" onclick="goDaily('expense')" style="display:flex;justify-content:space-between;align-items:center"><div><span style="font-size:9px;font-weight:800;color:#991B1B">إجمالي المصروف</span><br><b id="sumExpense" class="en" style="color:#ef4444;font-size:15px">0</b></div><div style="width:38px;height:38px;background:#FEE2E2;border-radius:12px;display:flex;align-items:center;justify-content:center">💸</div></div>
-<div class="card" onclick="goDaily('debt')" style="background:#FFFBEB;border-color:#FDE68A;display:flex;justify-content:space-between;align-items:center"><div><span style="font-size:9px;font-weight:800;color:#92400E">📌 مستحقة</span><br><b id="sumDue" class="en" style="color:#d97706;font-size:15px">0</b><br><span id="dueCount" style="font-size:8px;background:#FEF3C7;padding:3px 7px;border-radius:999px">0 شخص</span></div><div style="width:38px;height:38px;background:#FEF3C7;border-radius:12px;display:flex;align-items:center;justify-content:center">📒</div></div>
-<div class="card" onclick="goDaily('debt')" style="background:#F5F3FF;border-color:#DDD6FE;display:flex;justify-content:space-between;align-items:center"><div><span style="font-size:9px;font-weight:800;color:#6d28d9">⏳ مؤجلة</span><br><b id="sumOld" class="en" style="color:#7c3aed;font-size:15px">0</b><br><span id="oldCount" style="font-size:8px;background:#EDE9FE;padding:3px 7px;border-radius:999px">0 شخص</span></div><div style="width:38px;height:38px;background:#EDE9FE;border-radius:12px;display:flex;align-items:center;justify-content:center">⏳</div></div>
-</div>
-
-<div class="card" onclick="goDaily('total')" style="background:#111;color:#fff;display:flex;justify-content:space-between;align-items:center;padding:16px;margin-bottom:12px">
-<div><span style="font-size:9px;opacity:.6">الصافي العام بعد الديون</span><br><b id="sumNet" class="en" style="font-size:19px">0</b></div>
-<div style="text-align:center" onclick="event.stopPropagation();goDaily('amanat')"><span style="font-size:8px;opacity:.6">أمانات</span><br><b id="sumAmanat" class="en" style="font-size:13px;background:rgba(255,255,255,.15);padding:7px 13px;border-radius:999px">0</b></div>
-</div>
-
-<div id="alerts"></div>
-<div id="recent" style="margin-top:12px"></div>
-
-<script>
-let currentRange='month', chartMode='bar', searchQ='';
-function fmt(n){let x=typeof n==='string'?parseFloat(n.toString().replace(/,/g,'')):n;if(isNaN(x))return'0';return Math.round(x).toLocaleString('en-US')}
-function toEn(s){return String(s).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[^0-9.:]/g,'')}
-function getData(){return{
- trans:JSON.parse(localStorage.getItem('daily_trans_v2')||'[]'),
- debts:JSON.parse(localStorage.getItem('debts_pro_v2')||'[]'),
- amanat:JSON.parse(localStorage.getItem('amanat_trans')||'[]'),
- tasks:JSON.parse(localStorage.getItem('tasks_v6')||'[]'),
- attData:JSON.parse(localStorage.getItem('att_fixed_final')||'{}'),
- hols:JSON.parse(localStorage.getItem('att_hols_fixed')||'{}'),
- log:JSON.parse(localStorage.getItem('attendance_log')||'[]')
-}}
-function tick(){let d=new Date();document.getElementById('liveClock').innerText=d.toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});document.getElementById('today').innerText=d.toLocaleDateString('ar-EG',{weekday:'short',day:'numeric',month:'short'})}
-setInterval(tick,1000);tick();
-function goPage(p,i){try{let f=parent.document.querySelector('iframe[data-page="'+p+'"]');if(f&&!f.src) f.src=p;parent.switchPage(p,parent.document.querySelectorAll('.nav button')[i])}catch{}}
-function goDaily(tab){localStorage.setItem('daily_active_tab',tab);goPage('daily.html',1)}
-function goAtt(){goPage('attendance.html',2)}
-function setRange(r,el){currentRange=r;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');calc()}
-function toggleChart(){chartMode=chartMode==='bar'?'line':'bar';calc()}
-function onSearch(v){searchQ=v.toLowerCase().trim();calc()}
-function filterByRange(list){
- let now=new Date(), y=now.getFullYear(), m=now.getMonth(), d=now.getDate();
- if(currentRange==='today'){let ds=now.toISOString().split('T')[0];return list.filter(t=>t.date===ds)}
- if(currentRange==='week'){let from=new Date();from.setDate(d-6);return list.filter(t=>new Date(t.date)>=from)}
- if(currentRange==='month'){return list.filter(t=>{try{return new Date(t.date).getMonth()===m&&new Date(t.date).getFullYear()===y}catch{return false}})}
- if(currentRange==='year'){return list.filter(t=>{try{return new Date(t.date).getFullYear()===y}catch{return false}})}
- return list;
-}
-function calc(){
- let {trans,debts,amanat,tasks,attData,hols}=getData();
- let filtered=searchQ?trans.filter(t=>(t.cat+' '+(t.wallet||'')+' '+(t.note||'')).toLowerCase().includes(searchQ)):trans;
- let today=new Date().toISOString().split('T')[0], y=new Date().getFullYear(), mn=new Date().getMonth()+1;
- let tt=filtered.filter(t=>t.date===today);
- let todayInc=tt.filter(t=>t.type==='income').reduce((a,b)=>a+(b.amount||0),0);
- let todayExp=tt.filter(t=>t.type==='expense').reduce((a,b)=>a+(b.amount||0),0);
- document.getElementById('todayTotal').innerText=fmt(todayInc-todayExp)+' ج.م';
- document.getElementById('todayCount').innerText=filtered.filter(t=>t.date===today).length+' حركة';
- document.getElementById('todayProfit').innerText=(todayInc>=todayExp?'+':'')+fmt(todayInc-todayExp);
- document.getElementById('todayBar').style.width=Math.min(100,Math.abs(todayInc-todayExp)/1000*100+12)+'%';
- document.getElementById('todayBar').style.background=todayInc>=todayExp?'#16a34a':'#ef4444';
-
- let monthTrans=filtered.filter(t=>{try{let dt=new Date(t.date);return dt.getMonth()+1===mn&&dt.getFullYear()===y}catch{return false}});
- let mInc=monthTrans.filter(t=>t.type==='income').reduce((a,b)=>a+(b.amount||0),0);
- let mExp=monthTrans.filter(t=>t.type==='expense').reduce((a,b)=>a+(b.amount||0),0);
- document.getElementById('monthIncome').innerText=fmt(mInc);document.getElementById('monthExpense').innerText=fmt(mExp);
- document.getElementById('monthIncomeCount').innerText=monthTrans.filter(t=>t.type==='income').length+' عملية';
- document.getElementById('monthExpenseCount').innerText=monthTrans.filter(t=>t.type==='expense').length+' عملية';
- document.getElementById('q-income').innerText=fmt(mInc);document.getElementById('q-expense').innerText=fmt(mExp);
-
- let cash=trans.reduce((s,t)=>s+(t.type==='income'?t.amount:-t.amount),0);
- document.getElementById('cashBalance').innerText=fmt(cash);
- document.getElementById('cashStatus').innerText=cash>0?'نشط':cash<0?'سالب ⚠️':'فارغ';
- document.getElementById('cashStatus').style.background=cash>0?'#DCFCE7':cash<0?'#FEE2E2':'#F5F5F4';
-
- let due=debts.filter(d=>d.type==='due_monthly'), old=debts.filter(d=>d.type!=='due_monthly');
- let dueSum=due.reduce((a,b)=>a+(b.remaining||b.total||0),0), oldSum=old.reduce((a,b)=>a+(b.remaining||b.total||0),0);
- document.getElementById('sumDue').innerText=fmt(dueSum);document.getElementById('sumOld').innerText=fmt(oldSum);
- document.getElementById('dueCount').innerText=due.length+' شخص';document.getElementById('oldCount').innerText=old.length+' شخص';
- document.getElementById('q-debt').innerText=due.length+old.length;
-
- let amanatBal=amanat.filter(a=>a.type==='in').reduce((s,a)=>s+(a.amount||0),0)-amanat.filter(a=>a.type==='out').reduce((s,a)=>s+(a.amount||0),0);
- document.getElementById('sumAmanat').innerText=fmt(amanatBal);document.getElementById('q-amanat').innerText=fmt(amanatBal);
-
- let totalInc=filtered.filter(t=>t.type==='income').reduce((a,b)=>a+(b.amount||0),0);
- let totalExp=filtered.filter(t=>t.type==='expense').reduce((a,b)=>a+(b.amount||0),0);
- document.getElementById('sumIncome').innerText=fmt(totalInc);document.getElementById('sumExpense').innerText=fmt(totalExp);
- document.getElementById('sumNet').innerText=fmt(totalInc-totalExp-dueSum-oldSum);
-
- document.getElementById('tasksCount').innerText=tasks.length;
- let done=tasks.filter(t=>t.done).length;
- document.getElementById('tasksDone').innerText=done+'/'+tasks.length;
- document.getElementById('taskBar').style.width=tasks.length?Math.round(done/tasks.length*100)+'%':'0%';
-
- // Reports
- let repList=filterByRange(filtered);
- let rInc=repList.filter(t=>t.type==='income').reduce((a,b)=>a+(b.amount||0),0);
- let rExp=repList.filter(t=>t.type==='expense').reduce((a,b)=>a+(b.amount||0),0);
- let rNet=rInc-rExp;
- document.getElementById('repInc').innerText=fmt(rInc);document.getElementById('repExp').innerText=fmt(rExp);document.getElementById('repNet').innerText=fmt(rNet);
- let days=currentRange==='today'?1:currentRange==='week'?7:currentRange==='month'?new Date().getDate():currentRange==='year'?Math.ceil((new Date()-new Date(y,0,1))/86400000):Math.max(1,repList.length);
- document.getElementById('repIncAvg').innerText='متوسط '+fmt(rInc/days)+'/يوم';
- document.getElementById('repExpAvg').innerText='حرق '+fmt(rExp/days)+'/يوم';
- document.getElementById('repMargin').innerText='هامش '+(rInc?Math.round(rNet/rInc*100):0)+'%';
- let forecast=mExp+( (new Date(y,mn,0).getDate()-new Date().getDate()) * (mExp/days) );
- document.getElementById('repForecast').innerText=currentRange==='month'?fmt(rNet - (forecast-mExp))+' متوقع':'-';
- let byDay={};repList.forEach(t=>{if(!byDay[t.date]) byDay[t.date]={inc:0,exp:0};if(t.type==='income') byDay[t.date].inc+=t.amount; else byDay[t.date].exp+=t.amount});
- let bestDate='-', bestVal=-Infinity;Object.entries(byDay).forEach(([k,v])=>{let net=v.inc-v.exp;if(net>bestVal){bestVal=net;bestDate=k}});
- document.getElementById('repBest').innerText='أفضل يوم: '+bestDate+' ('+fmt(bestVal)+')';
-
- // Health Score
- let health=0;if(rInc>0){health=Math.max(0,Math.min(100, Math.round((rNet/rInc*70) + (cash>0?20:0) - (dueSum>rInc*0.3?15:0) )))} else if(cash>0) health=50;
- let ring=document.getElementById('scoreRing');ring.innerText=health;ring.style.background=health>70?'#DCFCE7':health>40?'#FEF3C7':'#FEE2E2';ring.style.color=health>70?'#166534':health>40?'#92400E':'#991B1B';
- document.getElementById('healthLabel').innerText=health>75?'ممتاز':health>50?'جيد':health>30?'متوسط':'خطر';
-
- drawChart(repList);
- renderCats(repList,filtered);
-
- let totalH=0;Object.entries(attData).forEach(([k,r])=>{let [yy,mm]=k.split('-').map(Number);if(yy===y&&mm===mn&&!hols[k]){let s=parseFloat(toEn(r.in||'0'))||0;let e=parseFloat(toEn(r.out||'0'))||0;if(e>s) totalH+=e-s;}});
- document.getElementById('q-att').innerText=totalH.toFixed(1)+'h';document.getElementById('workHours').innerText=totalH.toFixed(1)+'h';
-
- // wallets
- let wallets={};filtered.forEach(t=>{let w=t.wallet||'كاش';if(!wallets[w]) wallets[w]=0;wallets[w]+=(t.type==='income'?t.amount:-t.amount)});
- document.getElementById('q-wallets').innerText=Object.keys(wallets).length+' محفظة';
- let wHtml='';Object.entries(wallets).sort((a,b)=>b[1]-a[1]).slice(0,3).forEach(([w,v])=>{wHtml+=`<div style="display:inline-block;background:#fff;border:1px solid #F2EFEA;border-radius:999px;padding:4px 9px;font-size:8px;margin:2px"><b>${w}</b> <span class="en">${fmt(v)}</span></div>`});
- document.getElementById('walletBreak').innerHTML=wHtml?'<div style="font-size:9px;font-weight:700;margin-bottom:5px">👛 توزيع المحافظ</div>'+wHtml:'';
-
- let alerts=document.getElementById('alerts');let ah='';
- if(dueSum>0) ah+=`<div class="card" onclick="goDaily('debt')" style="background:#FFFBEB;border-color:#FDE68A;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding:11px"><span style="font-size:10px">📌 <b>${due.length}</b> مستحقة <b class="en">${fmt(dueSum)}</b></span><span style="font-size:9px;background:#92400E;color:#fff;padding:5px 10px;border-radius:999px">عرض</span></div>`;
- if(cash<0) ah+=`<div class="card" style="background:#FEF2F2;border-color:#FECACA;padding:11px;margin-bottom:6px"><span style="font-size:10px">⚠️ الكاش بالسالب <b class="en">${fmt(cash)}</b></span></div>`;
- alerts.innerHTML=ah;
-
- let recent=document.getElementById('recent');let last=filtered.slice(0,10);
- let rHtml='<div style="display:flex;justify-content:space-between;margin:12px 2px 6px"><b style="font-size:11px">آخر الحركات</b><span style="font-size:9px;color:#9aa0aa" onclick="goDaily(\'total\')">الكل →</span></div>';
- last.forEach(t=>{
-  let txt=(t.cat||'')+' '+(t.wallet||'');if(searchQ){let re=new RegExp('('+searchQ+')','gi');txt=txt.replace(re,'<mark style="background:#FEF08A;padding:0 2px;border-radius:4px">$1</mark>')}
-  rHtml+=`<div class="card" onclick="goDaily('${t.type}')" style="display:flex;justify-content:space-between;align-items:center;padding:11px;margin-bottom:6px"><div style="display:flex;gap:8px;align-items:center"><div style="width:32px;height:32px;border-radius:10px;background:${t.type==='income'?'#DCFCE7':'#FEE2E2'};display:flex;align-items:center;justify-content:center">${t.type==='income'?'💰':'💸'}</div><div><div style="font-size:11px;font-weight:700">${txt}</div><div style="font-size:7px;color:#9aa0aa">${t.date} • ${t.wallet||'كاش'}</div></div></div><b class="en" style="font-size:12px;color:${t.type==='income'?'#16a34a':'#ef4444'}">${t.type==='income'?'+':''}${fmt(t.amount)}</b></div>`;
- });
- recent.innerHTML=rHtml;
-}
-
-function drawChart(list){
- let c=document.getElementById('reportCanvas'), ctx=c.getContext('2d');
- let W=c.width=c.clientWidth*2, H=c.height=280;
- ctx.clearRect(0,0,W,H);
- let map={}, labels=[];
- if(currentRange==='today'){
-  for(let h=0;h<24;h++){let k=h.toString().padStart(2,'0')+':00';map[k]={inc:0,exp:0};labels.push(k)}
- } else {
-  for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);let ds=d.toISOString().split('T')[0];map[ds]={inc:0,exp:0};labels.push(ds)}
- }
- list.forEach(t=>{if(map[t.date]!==undefined){if(t.type==='income') map[t.date].inc+=t.amount; else map[t.date].exp+=t.amount}});
- let maxV=Math.max(100,...Object.values(map).map(v=>Math.max(v.inc,v.exp)));
- ctx.fillStyle='#FBF9F6';ctx.fillRect(0,0,W,H);
- if(chartMode==='bar'){
-  let barW=W/(labels.length*2.8), gap=barW*0.7;
-  labels.forEach((lab,i)=>{
-   let v=map[lab]||{inc:0,exp:0}, x=30+i*(barW*2+gap);
-   let hInc=v.inc/maxV*(H-50), hExp=v.exp/maxV*(H-50);
-   ctx.fillStyle='#16a34a';ctx.beginPath();ctx.roundRect(x,H-30-hInc,barW,hInc,7);ctx.fill();
-   ctx.fillStyle='#fca5a5';ctx.beginPath();ctx.roundRect(x+barW+6,H-30-hExp,barW,hExp,7);ctx.fill();
-   ctx.fillStyle='#9aa0aa';ctx.font='13px JetBrains Mono';ctx.fillText(lab.slice(-5),x,H-8);
-  });
- } else {
-  let cum=0, pts=[];labels.forEach((lab,i)=>{let v=map[lab]||{inc:0,exp:0};cum+=v.inc-v.exp;pts.push({x:30+i*(W-60)/Math.max(1,labels.length-1),y:H-30 - (cum/maxV*(H-60)),val:cum})});
-  ctx.strokeStyle='#111';ctx.lineWidth=4;ctx.beginPath();pts.forEach((p,i)=>{i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y)});ctx.stroke();
-  pts.forEach(p=>{ctx.fillStyle='#111';ctx.beginPath();ctx.arc(p.x,p.y,6,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p.x,p.y,2,0,Math.PI*2);ctx.fill()});
- }
-}
-
-function renderCats(repList,all){
- let catMap={};repList.forEach(t=>{let k=t.cat||'غير مصنف';if(!catMap[k]) catMap[k]={inc:0,exp:0,c:0};if(t.type==='income') catMap[k].inc+=t.amount; else catMap[k].exp+=t.amount;catMap[k].c++});
- let sorted=Object.entries(catMap).sort((a,b)=>(b[1].exp+b[1].inc)-(a[1].exp+a[1].inc)).slice(0,4);
- let el=document.getElementById('catBreak');let html='';
- sorted.forEach(([name,v])=>{
-  let net=v.inc-v.exp;
-  html+=`<div style="background:#fff;border:1px solid #F2EFEA;border-radius:14px;padding:10px"><div style="font-size:9px;font-weight:800;display:flex;justify-content:space-between"><span>${name}</span><span style="font-size:7px;color:#9aa0aa">${v.c} حركة</span></div><div style="display:flex;justify-content:space-between;margin-top:5px"><span class="en" style="font-size:10px;color:#16a34a">+${fmt(v.inc)}</span><span class="en" style="font-size:10px;color:#ef4444">-${fmt(v.exp)}</span></div><div class="bar" style="margin-top:7px"><div class="bar-fill" style="width:${Math.min(100,(v.exp+v.inc)/800*100)}%;background:${net>=0?'#16a34a':'#ef4444'}"></div></div></div>`;
- });
- el.innerHTML=html||'<div style="font-size:9px;color:#9aa0aa">لا يوجد تصنيفات</div>';
-}
-
-function getLog(){return JSON.parse(localStorage.getItem('attendance_log')||'[]')}function saveLog(l){localStorage.setItem('attendance_log',JSON.stringify(l))}
-function syncToSheet(type){let n=new Date(), y=n.getFullYear(), m=n.getMonth()+1, d=n.getDate(), key=`${y}-${m}-${d}`, timeDec=(n.getHours()+n.getMinutes()/60).toFixed(2);let data=JSON.parse(localStorage.getItem('att_fixed_final')||'{}');if(!data[key]) data[key]={in:'',out:''};if(type==='in') data[key].in=timeDec; else data[key].out=timeDec;localStorage.setItem('att_fixed_final',JSON.stringify(data))}
-function renderAtt(){let log=getLog(), today=new Date().toISOString().split('T')[0], rec=log.find(r=>r.date===today), el=document.getElementById('attStatus');if(!rec){el.innerText='غير مسجل';el.style.color='#fca5a5';document.getElementById('attSub').innerText='سجل حضورك';return;}if(rec.in&&!rec.out){el.innerText='حاضر من '+rec.in;el.style.color='#4ade80';document.getElementById('attSub').innerText='يوم عمل نشط'}else if(rec.in&&rec.out){el.innerText='انصرف '+rec.out;el.style.color='#fca5a5';document.getElementById('attSub').innerText='انتهى اليوم'}}
-function checkIn(){let log=getLog(), today=new Date().toISOString().split('T')[0], now=new Date().toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}), rec=log.find(r=>r.date===today);if(rec&&rec.in) return;if(!rec){rec={date:today,in:now,out:null};log.push(rec);}else rec.in=now;saveLog(log);renderAtt();syncToSheet('in');calc();}
-function checkOut(){let log=getLog(), today=new Date().toISOString().split('T')[0], rec=log.find(r=>r.date===today);if(!rec||!rec.in) return;rec.out=new Date().toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});saveLog(log);renderAtt();syncToSheet('out');calc();}
-function exportCSV(){let {trans}=getData();if(!trans.length) return alert('لا يوجد بيانات');let csv='date,type,cat,amount,wallet,note\n'+trans.map(t=>`${t.date},${t.type},${t.cat},${t.amount},${t.wallet||''},${(t.note||'').replace(/,/g,' ')}`).join('\n');let blob=new Blob([csv],{type:'text/csv'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='report-'+new Date().toISOString().split('T')[0]+'.csv';a.click()}
-function exportJSON(){let data={trans:JSON.parse(localStorage.getItem('daily_trans_v2')||'[]'),debts:JSON.parse(localStorage.getItem('debts_pro_v2')||'[]'),amanat:JSON.parse(localStorage.getItem('amanat_trans')||'[]'),tasks:JSON.parse(localStorage.getItem('tasks_v6')||'[]')};let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='backup-'+Date.now()+'.json';a.click()}
-calc();renderAtt();setInterval(calc,3000);
-</script>
-</body>
-</html>,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#111111">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="https://cdn-icons-png.flaticon.com/512/5968/5968705.png">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'IBM Plex Sans Arabic',sans-serif}
 body{background:#FBF9F6;height:100dvh;overflow:hidden;position:relative}
 .pageWrap{position:absolute;top:0;left:0;right:0;bottom:68px;overflow:hidden}
-.page{position:absolute;top:0;left:0;width:100%;height:100%;border:none;opacity:0;pointer-events:none;transform:translateX(10px);transition:opacity .18s ease, transform .18s ease}
+.page{position:absolute;top:0;left:0;width:100%;height:100%;border:none;opacity:0;pointer-events:none;transform:translateX(10px);transition:.18s}
 .page.active{opacity:1;pointer-events:auto;transform:translateX(0);z-index:2}
 .nav{position:fixed;bottom:0;left:0;right:0;height:68px;background:#fff;border-top:1px solid #F2EFEA;display:flex;align-items:center;z-index:100}
-.nav button{flex:1;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 2px;border-radius:14px;color:#9aa0aa;font-size:10px;font-weight:700}
+.nav button{flex:1;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border-radius:14px;color:#9aa0aa;font-size:10px;font-weight:700;cursor:pointer}
 .nav button span:first-child{font-size:20px}
 .nav button.active{color:#111;background:#F5F5F4}
-</style></head><body>
-
+#installBtn{display:none;position:fixed;top:12px;left:12px;z-index:999;background:#111;color:#fff;border:none;padding:10px 16px;border-radius:999px;font-size:11px;font-weight:800}
+</style>
+</head>
+<body>
+<button id="installBtn">📲 تثبيت التطبيق APK</button>
 <div class="pageWrap">
   <iframe data-page="home.html" src="home.html" class="page active"></iframe>
   <iframe data-page="daily.html" src="about:blank" class="page"></iframe>
   <iframe data-page="attendance.html" src="about:blank" class="page"></iframe>
   <iframe data-page="tasks.html" src="about:blank" class="page"></iframe>
 </div>
-
 <nav class="nav">
   <button class="active" onclick="switchPage('home.html',this)"><span>🏠</span><span>الرئيسية</span></button>
   <button onclick="switchPage('daily.html',this)"><span>📅</span><span>اليومية</span></button>
   <button onclick="switchPage('attendance.html',this)"><span>⏱️</span><span>الحضور</span></button>
   <button onclick="switchPage('tasks.html',this)"><span>📝</span><span>المهام</span></button>
 </nav>
-
 <script>
-const frames = document.querySelectorAll('.page');
-function switchPage(name, btn){
+const frames=document.querySelectorAll('.page');
+function switchPage(name,btn){
   frames.forEach(f=>{
-    const isTarget = f.dataset.page === name;
-    f.classList.toggle('active', isTarget);
-    if(isTarget && f.src.includes('about:blank')){
-      f.src = name;
-    }
+    const isTarget=f.dataset.page===name;
+    f.classList.toggle('active',isTarget);
+    if(isTarget && f.src.includes('about:blank')) f.src=name;
   });
   document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
 }
-// حمّل الباقي في الخلفية بعد ما الرئيسية تفتح عشان يبقوا جاهزين للفتح الفوري
-window.addEventListener('load', ()=>{
-  setTimeout(()=>{
-    document.querySelector('[data-page="daily.html"]').src = 'daily.html';
-  }, 1000);
-  setTimeout(()=>{
-    document.querySelector('[data-page="attendance.html"]').src = 'attendance.html';
-  }, 2000);
-  setTimeout(()=>{
-    document.querySelector('[data-page="tasks.html"]').src = 'tasks.html';
-  }, 3000);
+window.addEventListener('load',()=>{
+  setTimeout(()=>{document.querySelector('[data-page="daily.html"]').src='daily.html'},800);
+  setTimeout(()=>{document.querySelector('[data-page="attendance.html"]').src='attendance.html'},1600);
+  setTimeout(()=>{document.querySelector('[data-page="tasks.html"]').src='tasks.html'},2400);
 });
+let deferredPrompt;
+const installBtn=document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();deferredPrompt=e;installBtn.style.display='block';
+});
+installBtn.addEventListener('click',async()=>{
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const {outcome}=await deferredPrompt.userChoice;
+  if(outcome==='accepted') installBtn.style.display='none';
+  deferredPrompt=null;
+});
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js');
+}
 </script>
-</body></html>
+</body>
+</html>
