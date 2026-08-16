@@ -2,70 +2,110 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<meta name="theme-color" content="#111111">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<link rel="manifest" href="./manifest.json">
-<link rel="icon" href="https://cdn-icons-png.flaticon.com/512/5968/5968705.png">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#16A34A">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
+:root{
+  --bg:#F0FDF4; --bg-soft:#DCFCE7; --card:#FFFFFF; --card-border:#BBF7D0;
+  --text:#14532D; --text-soft:#4ADE80; --primary:#16A34A; --hero:#16A34A; --accent:#22C55E;
+  --nav-bg: rgba(255,255,255,0.9);
+}
 *{box-sizing:border-box;margin:0;padding:0;font-family:'IBM Plex Sans Arabic',sans-serif}
-body{background:#FBF9F6;height:100dvh;overflow:hidden;position:relative}
-.pageWrap{position:absolute;top:0;left:0;right:0;bottom:68px;overflow:hidden}
-.page{position:absolute;top:0;left:0;width:100%;height:100%;border:none;opacity:0;pointer-events:none;transform:translateX(10px);transition:.18s}
-.page.active{opacity:1;pointer-events:auto;transform:translateX(0);z-index:2}
-.nav{position:fixed;bottom:0;left:0;right:0;height:68px;background:#fff;border-top:1px solid #F2EFEA;display:flex;align-items:center;z-index:100}
-.nav button{flex:1;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border-radius:14px;color:#9aa0aa;font-size:10px;font-weight:700;cursor:pointer}
-.nav button span:first-child{font-size:20px}
-.nav button.active{color:#111;background:#F5F5F4}
-#installBtn{display:none;position:fixed;top:12px;left:12px;z-index:999;background:#111;color:#fff;border:none;padding:10px 16px;border-radius:999px;font-size:11px;font-weight:800}
+body{background:var(--bg);height:100dvh;overflow:hidden;transition: background.35s, color.35s}
+.pageWrap{position:absolute;inset:0 0 88px 0;background:var(--bg)}
+.page{position:absolute;inset:0;width:100%;height:100%;border:none;opacity:0;pointer-events:none;transition:opacity.25s;background:var(--bg)}
+.page.active{opacity:1;pointer-events:auto;z-index:2}
+.nav{
+  position:fixed;bottom:14px;left:14px;right:14px;height:70px;
+  background:var(--nav-bg);
+  backdrop-filter:blur(24px) saturate(200%);
+  -webkit-backdrop-filter:blur(24px) saturate(200%);
+  border:1.5px solid var(--card-border);
+  border-radius:22px;
+  display:flex;align-items:center;padding:7px;gap:6px;z-index:100;
+  box-shadow: 0 20px 40px -12px rgba(0,0,0,.15);
+  transition: all.35s;
+}
+.nav button{
+  flex:1;height:100%;border:none;background:transparent;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  border-radius:15px;color:var(--text-soft);font-size:9.5px;font-weight:700;cursor:pointer;transition:all.25s;position:relative
+}
+.nav button.icon{font-size:18px;transition:.25s}
+.nav button.active{background:var(--hero);color:#fff;box-shadow:0 8px 20px color-mix(in srgb, var(--hero) 30%, transparent);transform:translateY(-1px)}
+.nav button.active::after{content:'';position:absolute;bottom:6px;width:16px;height:3px;background:#fff;border-radius:99px;opacity:.8}
 </style>
 </head>
 <body>
-<button id="installBtn">📲 تثبيت التطبيق APK</button>
 <div class="pageWrap">
-  <iframe data-page="home.html" src="home.html" class="page active"></iframe>
-  <iframe data-page="daily.html" src="about:blank" class="page"></iframe>
-  <iframe data-page="attendance.html" src="about:blank" class="page"></iframe>
-  <iframe data-page="tasks.html" src="about:blank" class="page"></iframe>
+  <iframe data-page="home.html" src="home.html" class="page active" title="home"></iframe>
+  <iframe data-page="daily.html" src="about:blank" class="page" title="daily"></iframe>
+  <iframe data-page="attendance.html" src="about:blank" class="page" title="attendance"></iframe>
+  <iframe data-page="tasks.html" src="about:blank" class="page" title="tasks"></iframe>
 </div>
 <nav class="nav">
-  <button class="active" onclick="switchPage('home.html',this)"><span>🏠</span><span>الرئيسية</span></button>
-  <button onclick="switchPage('daily.html',this)"><span>📅</span><span>اليومية</span></button>
-  <button onclick="switchPage('attendance.html',this)"><span>⏱️</span><span>الحضور</span></button>
-  <button onclick="switchPage('tasks.html',this)"><span>📝</span><span>المهام</span></button>
+  <button class="active" onclick="switchPage('home.html',this)"><span class="icon">🏠</span><span>الرئيسية</span></button>
+  <button onclick="switchPage('daily.html',this)"><span class="icon">📊</span><span>اليومية</span></button>
+  <button onclick="switchPage('attendance.html',this)"><span class="icon">⏱️</span><span>الحضور</span></button>
+  <button onclick="switchPage('tasks.html',this)"><span class="icon">✓</span><span>المهام</span></button>
 </nav>
 <script>
+const themes={
+  black: {"--bg":"#F4F4F5","--bg-soft":"#E4E4E7","--card":"#FFFFFF","--card-border":"#D4D4D8","--text":"#18181B","--text-soft":"#71717A","--primary":"#18181B","--hero":"#18181B","--accent":"#18181B","--nav-bg":"rgba(255,255,255,0.9)"},
+  red: {"--bg":"#FFF1F2","--bg-soft":"#FFE4E6","--card":"#FFFFFF","--card-border":"#FECDD3","--text":"#881337","--text-soft":"#FB7185","--primary":"#E11D48","--hero":"#E11D48","--accent":"#F43F5E","--nav-bg":"rgba(255,241,242,0.92)"},
+  purple: {"--bg":"#F5F3FF","--bg-soft":"#EDE9FE","--card":"#FFFFFF","--card-border":"#DDD6FE","--text":"#4C1D95","--text-soft":"#A78BFA","--primary":"#7C3AED","--hero":"#7C3AED","--accent":"#8B5CF6","--nav-bg":"rgba(245,243,255,0.92)"},
+  green: {"--bg":"#F0FDF4","--bg-soft":"#DCFCE7","--card":"#FFFFFF","--card-border":"#BBF7D0","--text":"#14532D","--text-soft":"#4ADE80","--primary":"#16A34A","--hero":"#16A34A","--accent":"#22C55E","--nav-bg":"rgba(240,253,244,0.92)"},
+  blue: {"--bg":"#EFF6FF","--bg-soft":"#DBEAFE","--card":"#FFFFFF","--card-border":"#BFDBFE","--text":"#1E3A8A","--text-soft":"#60A5FA","--primary":"#2563EB","--hero":"#2563EB","--accent":"#3B82F6","--nav-bg":"rgba(239,246,255,0.92)"},
+  orange: {"--bg":"#FFFBEB","--bg-soft":"#FEF3C7","--card":"#FFFFFF","--card-border":"#FDE68A","--text":"#92400E","--text-soft":"#FBBF24","--primary":"#D97706","--hero":"#D97706","--accent":"#F59E0B","--nav-bg":"rgba(255,251,235,0.92)"}
+};
+
+function applyTheme(name){
+  let t=themes[name]; if(!t) return;
+  Object.entries(t).forEach(([k,v])=>document.documentElement.style.setProperty(k,v));
+  localStorage.setItem('omar_theme',name);
+  localStorage.setItem('theme',name);
+  let meta=document.querySelector('meta[name="theme-color"]'); if(meta) meta.content=t["--hero"];
+  // طبق نفس الألوان جوه كل الـ iframes اللي مفتوحة
+  document.querySelectorAll('.page').forEach(f=>{
+    try{ if(f.contentDocument && f.contentDocument.documentElement){
+      Object.entries(t).forEach(([k,v])=>f.contentDocument.documentElement.style.setProperty(k,v));
+    }}catch(e){}
+  });
+}
+
 const frames=document.querySelectorAll('.page');
 function switchPage(name,btn){
   frames.forEach(f=>{
-    const isTarget=f.dataset.page===name;
-    f.classList.toggle('active',isTarget);
-    if(isTarget && f.src.includes('about:blank')) f.src=name;
+    const is=f.dataset.page===name;
+    f.classList.toggle('active',is);
+    if(is && f.src.includes('about:blank')){
+      f.src=name;
+      f.onload=()=>{
+        let cur=localStorage.getItem('omar_theme')||'green';
+        let t=themes[cur]; if(t && f.contentDocument){
+          Object.entries(t).forEach(([k,v])=>f.contentDocument.documentElement.style.setProperty(k,v));
+        }
+      };
+    }else if(is && f.contentDocument){
+      let cur=localStorage.getItem('omar_theme')||'green';
+      let t=themes[cur]; if(t){
+        Object.entries(t).forEach(([k,v])=>f.contentDocument.documentElement.style.setProperty(k,v));
+      }
+    }
   });
   document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  if(navigator.vibrate) navigator.vibrate(12);
 }
-window.addEventListener('load',()=>{
-  setTimeout(()=>{document.querySelector('[data-page="daily.html"]').src='daily.html'},800);
-  setTimeout(()=>{document.querySelector('[data-page="attendance.html"]').src='attendance.html'},1600);
-  setTimeout(()=>{document.querySelector('[data-page="tasks.html"]').src='tasks.html'},2400);
-});
-let deferredPrompt;
-const installBtn=document.getElementById('installBtn');
-window.addEventListener('beforeinstallprompt',e=>{
-  e.preventDefault();deferredPrompt=e;installBtn.style.display='block';
-});
-installBtn.addEventListener('click',async()=>{
-  if(!deferredPrompt) return;
-  deferredPrompt.prompt();
-  const {outcome}=await deferredPrompt.userChoice;
-  if(outcome==='accepted') installBtn.style.display='none';
-  deferredPrompt=null;
-});
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./sw.js');
-}
+
+// أول تحميل
+applyTheme(localStorage.getItem('omar_theme')||'green');
+// اسمع أي تغيير جاي من home.html
+window.addEventListener('storage',()=>{ let th=localStorage.getItem('omar_theme'); if(th) applyTheme(th); });
+setInterval(()=>{ let th=localStorage.getItem('omar_theme'); if(th && themes[th]) applyTheme(th); },500);
+
+window.applyTheme = applyTheme;
 </script>
 </body>
 </html>
