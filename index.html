@@ -66,7 +66,6 @@ function applyTheme(name){
   localStorage.setItem('omar_theme',name);
   localStorage.setItem('theme',name);
   let meta=document.querySelector('meta[name="theme-color"]'); if(meta) meta.content=t["--hero"];
-  // طبق نفس الألوان جوه كل الـ iframes اللي مفتوحة
   document.querySelectorAll('.page').forEach(f=>{
     try{ if(f.contentDocument && f.contentDocument.documentElement){
       Object.entries(t).forEach(([k,v])=>f.contentDocument.documentElement.style.setProperty(k,v));
@@ -99,9 +98,7 @@ function switchPage(name,btn){
   if(navigator.vibrate) navigator.vibrate(12);
 }
 
-// أول تحميل
 applyTheme(localStorage.getItem('omar_theme')||'green');
-// اسمع أي تغيير جاي من home.html
 window.addEventListener('storage',()=>{ let th=localStorage.getItem('omar_theme'); if(th) applyTheme(th); });
 setInterval(()=>{ let th=localStorage.getItem('omar_theme'); if(th && themes[th]) applyTheme(th); },500);
 
