@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html>
-<body>
-<button onclick="test()">جرب الربط بالشيت</button>
+<body style="text-align:center;padding:50px">
+<button onclick="test()" style="padding:15px 30px;background:#16A34A;color:#fff;border:none;border-radius:10px;font-weight:900">جرب الربط بالشيت الجديد V2</button>
 <script>
   function test() {
-    fetch("https://script.google.com/macros/s/AKfycbzh_9Ob76032uBa-0WqRopMVvZ5nEfwiJ7cE9wSQ8JItDnmGezp40OC23L0oDwlHJetjg/exec", {
+    fetch("https://script.google.com/macros/s/AKfycbwZK86VlWCxTAm0id556i3akziyE1oT8Qk75Zs2WRzR3zaZn-WqKOfGPi8_zXcPcwEImA/exec", {
       method: "POST",
-      mode: "no-cors",
-      body: JSON.stringify({ tab: "اليومية - Daily", values: ["2026-08-16", "مصروف", "اختبار من عمر", "100", "محفظة", "تجربة", Date.now()] })
-    }).then(() => alert("اتبعت! شوف الشيت دلوقتي")).catch(() => alert("فشل"));
+      body: JSON.stringify({ tab: "اليومية - Daily", values: ["2026-08-17", "مصروف", "اختبار V2 من عمر", "100", "محفظة", "تجربة بعد الربط", Date.now()] })
+    }).then(() => alert("✅ اتبعت! شوف الشيت Omar تاب اليومية - Daily دلوقتي")).catch(() => alert("فشل"));
   }
 </script>
 </body>
