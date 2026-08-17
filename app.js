@@ -10,7 +10,6 @@ async function sendToOmarSheet(tabName, rowArray) {
       body: JSON.stringify({ tab: tabName, values: rowArray })
     });
     console.log("✅ تم الارسال لـ " + tabName + ":", rowArray);
-    // رسالة صغيرة
     let t = document.getElementById('toast');
     if (!t) {
       t = document.createElement('div');
@@ -28,6 +27,15 @@ async function sendToOmarSheet(tabName, rowArray) {
   }
 }
 
+// الفانكشن دي اللي هتربط الرئيسية بتبويب الحضور
+function syncToAttendanceTab(dateKey, inH, outH){
+  let data = JSON.parse(localStorage.getItem('att_fixed_final')||'{}');
+  if(!data[dateKey]) data[dateKey]={in:'',out:''};
+  if(inH) data[dateKey].in = String(inH);
+  if(outH) data[dateKey].out = String(outH);
+  localStorage.setItem('att_fixed_final', JSON.stringify(data));
+}
+
 function saveDailyEntry(type, category, amount, wallet, notes) {
   const row = [new Date().toISOString().split('T')[0], type, category, amount, wallet, notes, new Date().toLocaleTimeString('ar-EG'), Date.now()];
   let all = JSON.parse(localStorage.getItem('omar_daily') || '[]');
@@ -37,8 +45,13 @@ function saveDailyEntry(type, category, amount, wallet, notes) {
 }
 
 function saveAttendance(inTime, outTime) {
-  const row = [new Date().toISOString().split('T')[0], inTime, outTime, "", "حاضر", "", Date.now()];
+  const today = new Date().toISOString().split('T')[0];
+  const row = [today, inTime, outTime, "", "حاضر", "", Date.now()];
   localStorage.setItem('omar_attendance_' + row[0], JSON.stringify(row));
+  // تحديث تبويب الحضور كمان
+  let now = new Date();
+  let key = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
+  syncToAttendanceTab(key, inTime, outTime);
   return sendToOmarSheet("الحضور والانصراف - Attendance", row);
 }
 
@@ -58,4 +71,4 @@ function saveTransaction(type, category, amount, wallet, desc) {
   return sendToOmarSheet("العمليات - Transactions", row);
 }
 
-console.log("Omar System Ready - New URL 
+console.log("Omar System Ready - New URL - Fixed Sync");
